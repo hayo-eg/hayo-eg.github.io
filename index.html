@@ -10,7 +10,17 @@
   <meta name="theme-color" content="#0f172a" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>هايو (Hayo) | منصة النقل واللوجستيات الذكية عند الطلب</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+const HY_BUILD="20261126-3";
+(function(){
+  let busy=false;
+  async function chk(){ if(busy||!/^https?:/.test(location.protocol))return; busy=true;
+    try{ const r=await fetch(location.pathname+"?hyv="+Date.now(),{cache:"no-store"}); const t=await r.text(); const m=t.match(/const HY_BUILD="([^"]+)"/);
+      if(m&&m[1]!==HY_BUILD){ if(!sessionStorage.getItem("hy-rl-"+m[1])){ sessionStorage.setItem("hy-rl-"+m[1],"1"); location.replace(location.pathname+"?hyv="+m[1]); } } }catch(e){} busy=false; }
+  chk(); document.addEventListener("visibilitychange",()=>{ if(!document.hidden) chk(); }); setInterval(chk,300000);
+})();
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
