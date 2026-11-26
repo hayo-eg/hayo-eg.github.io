@@ -133,24 +133,124 @@
             <div id="origin-wrap">
               <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التحميل</label>
               <select id="origin" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
-                <option value="10th_ramadan">العاشر من رمضان (المنطقة الصناعية)</option>
-                <option value="6th_october">6 أكتوبر (المنطقة الصناعية)</option>
-                <option value="alex_port">ميناء الإسكندرية</option>
-                <option value="sokhna_port">ميناء العين السخنة</option>
-                <option value="obour">سوق العبور / القليوبية</option>
+                <optgroup label="دمياط">
+                  <option value="damietta">دمياط (المدينة)</option>
+                  <option value="old_damietta">دمياط القديمة (منطقة مسجد عمرو بن العاص)</option>
+                  <option value="new_damietta">دمياط الجديدة</option>
+                  <option value="damietta_industrial">المنطقة الصناعية بدمياط الجديدة</option>
+                  <option value="damietta_furniture">ورش ومعارض الأثاث (دمياط، طريق السنانية)</option>
+                  <option value="ras_el_bar">رأس البر</option>
+                  <option value="kafr_saad">كفر سعد</option>
+                  <option value="faraskour">فارسكور</option>
+                </optgroup>
+                <optgroup label="الموانئ">
+                  <option value="damietta_port">ميناء دمياط</option>
+                  <option value="port_said">ميناء بورسعيد</option>
+                  <option value="east_port_said">ميناء شرق بورسعيد</option>
+                  <option value="alex_port">ميناء الإسكندرية</option>
+                  <option value="dekheila">ميناء الدخيلة</option>
+                  <option value="sokhna_port">ميناء العين السخنة</option>
+                  <option value="adabiya">ميناء الأدبية (السويس)</option>
+                </optgroup>
+                <optgroup label="المناطق الصناعية والأسواق">
+                  <option value="10th_ramadan" selected>العاشر من رمضان (المنطقة الصناعية)</option>
+                  <option value="6th_october">6 أكتوبر (المنطقة الصناعية)</option>
+                  <option value="obour">سوق العبور / القليوبية</option>
+                  <option value="sadat">مدينة السادات (المنطقة الصناعية)</option>
+                  <option value="badr">مدينة بدر (المنطقة الصناعية)</option>
+                  <option value="robiki">مدينة الجلود بالروبيكي</option>
+                  <option value="borg_el_arab">برج العرب (المنطقة الصناعية)</option>
+                  <option value="shubra">شبرا الخيمة (مصانع)</option>
+                </optgroup>
+                <optgroup label="المدن والمحافظات">
+                  <option value="new_cairo">القاهرة الجديدة / التجمع الخامس</option>
+                  <option value="cairo_ramses">القاهرة (رمسيس / وسط البلد)</option>
+                  <option value="giza">الجيزة</option>
+                  <option value="alexandria">الإسكندرية (المدينة)</option>
+                  <option value="mansoura">المنصورة / الدقهلية</option>
+                  <option value="tanta">طنطا</option>
+                  <option value="mahalla">المحلة الكبرى</option>
+                  <option value="zagazig">الزقازيق</option>
+                  <option value="benha">بنها</option>
+                  <option value="kafr_sheikh">كفر الشيخ</option>
+                  <option value="damanhour">دمنهور</option>
+                  <option value="ismailia">الإسماعيلية</option>
+                  <option value="suez">السويس</option>
+                  <option value="alamein">العلمين</option>
+                  <option value="fayoum">الفيوم</option>
+                  <option value="beni_suef">بني سويف</option>
+                  <option value="minya">المنيا</option>
+                  <option value="assiut">أسيوط (الصعيد)</option>
+                  <option value="sohag">سوهاج</option>
+                  <option value="luxor">الأقصر</option>
+                  <option value="aswan">أسوان</option>
+                </optgroup>
               </select>
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التسليم</label>
+              <div class="grid grid-cols-2 gap-1 text-[11px] font-bold mb-1.5" id="dest-modes">
+                <button type="button" data-mode="preset" onclick="setDestMode('preset')" class="dm-btn py-1.5 rounded-lg border">نقاط جاهزة</button>
+                <button type="button" data-mode="map" onclick="setDestMode('map')" class="dm-btn py-1.5 rounded-lg border">🗺️ من الخريطة</button>
+              </div>
               <select id="destination" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
-                <option value="new_cairo">القاهرة الجديدة / التجمع الخامس</option>
-                <option value="alex_port">الإسكندرية</option>
-                <option value="mansoura">المنصورة / الدقهلية</option>
-                <option value="assiut">أسيوط (الصعيد)</option>
-                <option value="10th_ramadan">العاشر من رمضان</option>
+                <optgroup label="دمياط">
+                  <option value="damietta">دمياط (المدينة)</option>
+                  <option value="old_damietta">دمياط القديمة (منطقة مسجد عمرو بن العاص)</option>
+                  <option value="new_damietta">دمياط الجديدة</option>
+                  <option value="damietta_industrial">المنطقة الصناعية بدمياط الجديدة</option>
+                  <option value="damietta_furniture">ورش ومعارض الأثاث (دمياط، طريق السنانية)</option>
+                  <option value="ras_el_bar">رأس البر</option>
+                  <option value="kafr_saad">كفر سعد</option>
+                  <option value="faraskour">فارسكور</option>
+                </optgroup>
+                <optgroup label="الموانئ">
+                  <option value="damietta_port">ميناء دمياط</option>
+                  <option value="port_said">ميناء بورسعيد</option>
+                  <option value="east_port_said">ميناء شرق بورسعيد</option>
+                  <option value="alex_port">ميناء الإسكندرية</option>
+                  <option value="dekheila">ميناء الدخيلة</option>
+                  <option value="sokhna_port">ميناء العين السخنة</option>
+                  <option value="adabiya">ميناء الأدبية (السويس)</option>
+                </optgroup>
+                <optgroup label="المناطق الصناعية والأسواق">
+                  <option value="10th_ramadan">العاشر من رمضان (المنطقة الصناعية)</option>
+                  <option value="6th_october">6 أكتوبر (المنطقة الصناعية)</option>
+                  <option value="obour">سوق العبور / القليوبية</option>
+                  <option value="sadat">مدينة السادات (المنطقة الصناعية)</option>
+                  <option value="badr">مدينة بدر (المنطقة الصناعية)</option>
+                  <option value="robiki">مدينة الجلود بالروبيكي</option>
+                  <option value="borg_el_arab">برج العرب (المنطقة الصناعية)</option>
+                  <option value="shubra">شبرا الخيمة (مصانع)</option>
+                </optgroup>
+                <optgroup label="المدن والمحافظات">
+                  <option value="new_cairo" selected>القاهرة الجديدة / التجمع الخامس</option>
+                  <option value="cairo_ramses">القاهرة (رمسيس / وسط البلد)</option>
+                  <option value="giza">الجيزة</option>
+                  <option value="alexandria">الإسكندرية (المدينة)</option>
+                  <option value="mansoura">المنصورة / الدقهلية</option>
+                  <option value="tanta">طنطا</option>
+                  <option value="mahalla">المحلة الكبرى</option>
+                  <option value="zagazig">الزقازيق</option>
+                  <option value="benha">بنها</option>
+                  <option value="kafr_sheikh">كفر الشيخ</option>
+                  <option value="damanhour">دمنهور</option>
+                  <option value="ismailia">الإسماعيلية</option>
+                  <option value="suez">السويس</option>
+                  <option value="alamein">العلمين</option>
+                  <option value="fayoum">الفيوم</option>
+                  <option value="beni_suef">بني سويف</option>
+                  <option value="minya">المنيا</option>
+                  <option value="assiut">أسيوط (الصعيد)</option>
+                  <option value="sohag">سوهاج</option>
+                  <option value="luxor">الأقصر</option>
+                  <option value="aswan">أسوان</option>
+                </optgroup>
               </select>
             </div>
           </div>
+
+          <p id="dest-hint" class="hidden -mt-1 text-xs rounded-lg px-3 py-2"></p>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -402,14 +502,50 @@
 
   <script>
     const LOCATIONS = {
-      "10th_ramadan": { name: "العاشر من رمضان", coords: [30.2965, 31.7416] },
-      "6th_october": { name: "6 أكتوبر", coords: [29.9285, 30.9188] },
-      "alex_port": { name: "الإسكندرية", coords: [31.2001, 29.9187] },
-      "sokhna_port": { name: "العين السخنة", coords: [29.6002, 32.3167] },
-      "obour": { name: "سوق العبور", coords: [30.2283, 31.4799] },
-      "new_cairo": { name: "القاهرة الجديدة", coords: [30.0074, 31.4913] },
-      "mansoura": { name: "المنصورة", coords: [31.0409, 31.3785] },
-      "assiut": { name: "أسيوط", coords: [27.1783, 31.1859] }
+      "damietta": { name: "دمياط (المدينة)", coords: [31.4167, 31.8214] },
+      "old_damietta": { name: "دمياط القديمة (منطقة مسجد عمرو بن العاص)", coords: [31.4339, 31.8113] },
+      "new_damietta": { name: "دمياط الجديدة", coords: [31.4365, 31.6781] },
+      "damietta_industrial": { name: "المنطقة الصناعية بدمياط الجديدة", coords: [31.4215, 31.6856] },
+      "damietta_furniture": { name: "ورش ومعارض الأثاث (دمياط، طريق السنانية)", coords: [31.423, 31.797] },
+      "ras_el_bar": { name: "رأس البر", coords: [31.5263, 31.8451] },
+      "kafr_saad": { name: "كفر سعد", coords: [31.3497, 31.6675] },
+      "faraskour": { name: "فارسكور", coords: [31.3355, 31.7204] },
+      "damietta_port": { name: "ميناء دمياط", coords: [31.4607, 31.7634] },
+      "port_said": { name: "ميناء بورسعيد", coords: [31.2632, 32.3055] },
+      "east_port_said": { name: "ميناء شرق بورسعيد", coords: [31.2467, 32.3199] },
+      "alex_port": { name: "ميناء الإسكندرية", coords: [31.2001, 29.9187] },
+      "dekheila": { name: "ميناء الدخيلة", coords: [31.1315, 29.8032] },
+      "sokhna_port": { name: "ميناء العين السخنة", coords: [29.6002, 32.3167] },
+      "adabiya": { name: "ميناء الأدبية (السويس)", coords: [29.9137, 32.4678] },
+      "10th_ramadan": { name: "العاشر من رمضان (المنطقة الصناعية)", coords: [30.2965, 31.7416] },
+      "6th_october": { name: "6 أكتوبر (المنطقة الصناعية)", coords: [29.9285, 30.9188] },
+      "obour": { name: "سوق العبور / القليوبية", coords: [30.2283, 31.4799] },
+      "sadat": { name: "مدينة السادات (المنطقة الصناعية)", coords: [30.3669, 30.6025] },
+      "badr": { name: "مدينة بدر (المنطقة الصناعية)", coords: [30.1428, 31.7428] },
+      "robiki": { name: "مدينة الجلود بالروبيكي", coords: [30.1214, 31.7509] },
+      "borg_el_arab": { name: "برج العرب (المنطقة الصناعية)", coords: [30.8347, 29.5775] },
+      "shubra": { name: "شبرا الخيمة (مصانع)", coords: [30.1286, 31.2422] },
+      "new_cairo": { name: "القاهرة الجديدة / التجمع الخامس", coords: [30.0074, 31.4913] },
+      "cairo_ramses": { name: "القاهرة (رمسيس / وسط البلد)", coords: [30.0615, 31.2466] },
+      "giza": { name: "الجيزة", coords: [29.9871, 31.2118] },
+      "alexandria": { name: "الإسكندرية (المدينة)", coords: [31.2001, 29.9187] },
+      "mansoura": { name: "المنصورة / الدقهلية", coords: [31.0409, 31.3785] },
+      "tanta": { name: "طنطا", coords: [30.7834, 30.9983] },
+      "mahalla": { name: "المحلة الكبرى", coords: [30.9724, 31.1683] },
+      "zagazig": { name: "الزقازيق", coords: [30.5853, 31.5035] },
+      "benha": { name: "بنها", coords: [30.4625, 31.1841] },
+      "kafr_sheikh": { name: "كفر الشيخ", coords: [31.3815, 30.8514] },
+      "damanhour": { name: "دمنهور", coords: [31.0375, 30.4711] },
+      "ismailia": { name: "الإسماعيلية", coords: [30.6044, 32.2771] },
+      "suez": { name: "السويس", coords: [29.9745, 32.5371] },
+      "alamein": { name: "العلمين", coords: [30.8339, 28.9493] },
+      "fayoum": { name: "الفيوم", coords: [29.3407, 30.6201] },
+      "beni_suef": { name: "بني سويف", coords: [28.8383, 30.8545] },
+      "minya": { name: "المنيا", coords: [28.2125, 30.9124] },
+      "assiut": { name: "أسيوط (الصعيد)", coords: [27.1783, 31.1859] },
+      "sohag": { name: "سوهاج", coords: [26.7625, 32.091] },
+      "luxor": { name: "الأقصر", coords: [25.7021, 32.6472] },
+      "aswan": { name: "أسوان", coords: [24.0911, 32.8973] }
     };
 
     const TRUCK_RATES = {
@@ -469,6 +605,7 @@
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
       map.on("click", onMapClick);
       setPickupMode(pickup.mode);
+      setDestMode(dest.mode);
     }
 
     /* ---------- صور: ضغط وتحويل إلى Blob ---------- */
@@ -565,7 +702,8 @@
       if (cbtn) { cbtn.disabled = true; cbtn.classList.add("is-loading"); }
       try {
       const oKey = pickup.mode === "preset" ? document.getElementById("origin").value : "custom";
-      const dKey = document.getElementById("destination").value;
+      const dKey = dest.mode === "map" ? "custom" : document.getElementById("destination").value;
+      if (dKey === "custom" && !dest.coords) return toast("اضغط على الخريطة لتحديد مكان التسليم أولاً.");
       if (oKey !== "custom" && oKey === dKey) return toast("يرجى اختيار نقطة تسليم مختلفة عن نقطة التحميل.");
       if (oKey === "custom" && !pickup.coords) return toast(pickup.mode === "current" ? "حدد موقعك الحالي أولاً أو اختر نقطة من الخريطة." : "اضغط على الخريطة لتحديد مكان الاستلام أولاً.");
       const row = {
@@ -574,6 +712,9 @@
         origin_lng: oKey === "custom" ? pickup.coords[1] : null,
         origin_label: oKey === "custom" ? pickup.label : null,
         pickup_mode: pickup.mode, dest_key: dKey,
+        dest_lat: dKey === "custom" ? dest.coords[0] : null,
+        dest_lng: dKey === "custom" ? dest.coords[1] : null,
+        dest_label: dKey === "custom" ? dest.label : null,
         truck_key: document.getElementById("truckType").value,
         weight: Math.min(30, Math.max(0.5, parseFloat(document.getElementById("weight").value) || 1)),
         cargo: document.getElementById("cargoDesc").value.trim().slice(0, 120) || "بضائع عامة",
@@ -637,11 +778,13 @@
 
     function statusBadge(st) { const m = STATUS_MAP[st] || STATUS_MAP.requested; return '<span class="badge-anim text-xs font-bold px-2.5 py-1 rounded-full ' + m.color + '">' + m.label + '</span>'; }
     function originName(s) { return s.origin_key === "custom" ? (s.origin_label || "موقع محدد") : (LOCATIONS[s.origin_key] || {}).name || ""; }
-    function destName(s) { return (LOCATIONS[s.dest_key] || {}).name || ""; }
+    function destName(s) { return s.dest_key === "custom" ? (s.dest_label || "موقع محدد") : (LOCATIONS[s.dest_key] || {}).name || ""; }
     function truckLabel(s) { return (TRUCK_RATES[s.truck_key] || {}).label || ""; }
     function mapsLink(s) {
-      if (s.origin_key !== "custom" || s.origin_lat == null) return "";
-      return '<a href="https://www.google.com/maps?q=' + Number(s.origin_lat) + ',' + Number(s.origin_lng) + '" target="_blank" rel="noopener" class="text-xs text-blue-600 underline">فتح موقع الاستلام في الخرائط</a>';
+      let out = "";
+      if (s.origin_key === "custom" && s.origin_lat != null) out += '<a href="https://www.google.com/maps?q=' + Number(s.origin_lat) + ',' + Number(s.origin_lng) + '" target="_blank" rel="noopener" class="text-xs text-blue-600 underline">فتح موقع الاستلام في الخرائط</a> ';
+      if (s.dest_key === "custom" && s.dest_lat != null) out += '<a href="https://www.google.com/maps?q=' + Number(s.dest_lat) + ',' + Number(s.dest_lng) + '" target="_blank" rel="noopener" class="text-xs text-blue-600 underline">فتح موقع التسليم في الخرائط</a>';
+      return out;
     }
     function pickupBadge(s) {
       if (s.pickup_mode === "map") return '<span class="text-[11px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">🗺️ استلام من الخريطة (صورة إلزامية)</span>';
@@ -948,6 +1091,7 @@
     async function init() {
       authTab("login");
       setPickupMode("preset");
+      setDestMode("preset");
       if (!sb) { document.getElementById("cfg-warn").classList.remove("hidden"); return; }
       const { data: s } = await sb.auth.getSession();
       if (s && s.session) await enterApp();
@@ -963,21 +1107,22 @@
 
     function updateMapAndPrice() {
       const oKey = pickup.mode === "preset" ? document.getElementById("origin").value : "custom";
-      const dKey = document.getElementById("destination").value;
+      const dKey = dest.mode === "map" ? "custom" : document.getElementById("destination").value;
       const tKey = document.getElementById("truckType").value;
       const weight = Math.min(30, Math.max(0.5, parseFloat(document.getElementById("weight").value) || 1));
       const isBackhaul = document.getElementById("backhaul").checked;
 
       const oLoc = oKey === "custom" ? (pickup.coords ? { name: pickup.label, coords: pickup.coords } : null) : LOCATIONS[oKey];
-      const dLoc = LOCATIONS[dKey];
-      if (!oLoc) {
+      const dLoc = dKey === "custom" ? (dest.coords ? { name: dest.label, coords: dest.coords } : null) : LOCATIONS[dKey];
+      if (!oLoc || !dLoc) {
         document.getElementById("calc-dist").innerText = "—";
         document.getElementById("calc-time").innerText = "—";
         document.getElementById("calc-price").innerText = "—";
         if (map) {
           [originMarker, destMarker, routeLine].forEach(l => l && map.removeLayer(l));
-          originMarker = routeLine = null;
-          destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + dLoc.name);
+          originMarker = destMarker = routeLine = null;
+          if (oLoc) originMarker = L.marker(oLoc.coords).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
+          if (dLoc) destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
         }
         return null;
       }
@@ -1001,7 +1146,7 @@
         if (routeLine) map.removeLayer(routeLine);
 
         originMarker = L.marker(oLoc.coords).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
-        destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + dLoc.name);
+        destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
         routeLine = L.polyline([oLoc.coords, dLoc.coords], { color: '#f97316', weight: 4, dashArray: '8, 8' }).addTo(map);
         map.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
       }
@@ -1026,6 +1171,7 @@
       if (m === "preset") { pickup.coords = null; setPickupHint(""); }
       else if (m === "current") { pickup.coords = null; pickup.label = ""; locateMe(); }
       else {
+        mapTarget = "origin";
         if (!pickup.coords || pickup.src !== "map") { pickup.coords = null; pickup.label = ""; }
         setPickupHint(pickup.coords ? "تم تحديد الموقع: " + fmtCoords(pickup.coords) : "اضغط على الخريطة لوضع دبوس مكان الاستلام. السائق سيرسل لك صورة البضاعة لتأكيدها.", "bg-purple-50 text-purple-800");
       }
@@ -1057,11 +1203,53 @@
         renderOriginLabel();
       }, { enableHighAccuracy: true, timeout: 10000 });
     }
+    /* ---------- Delivery location ---------- */
+    let dest = { mode: "preset", coords: null, label: "" };
+    let mapTarget = "origin";
+    function setDestHint(text, cls) {
+      const el = document.getElementById("dest-hint");
+      el.textContent = text || ""; el.className = (text ? "" : "hidden ") + "-mt-1 text-xs rounded-lg px-3 py-2 " + (cls || "");
+    }
+    function setDestMode(m) {
+      dest.mode = m;
+      document.querySelectorAll(".dm-btn").forEach(b => {
+        const on = b.dataset.mode === m;
+        b.className = "dm-btn py-1.5 rounded-lg border " + (on ? "bg-orange-500 text-white border-orange-500" : "bg-white text-slate-600 border-slate-300");
+      });
+      document.getElementById("destination").classList.toggle("hidden", m !== "preset");
+      let el = document.getElementById("dest-custom");
+      if (!el) {
+        el = document.createElement("div"); el.id = "dest-custom";
+        el.className = "w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold text-slate-700";
+        document.getElementById("destination").after(el);
+      }
+      el.classList.toggle("hidden", m === "preset");
+      if (m === "preset") { dest.coords = null; dest.label = ""; setDestHint(""); if (mapTarget === "dest") mapTarget = "origin"; }
+      else {
+        mapTarget = "dest"; dest.coords = null; dest.label = "";
+        setDestHint("اضغط على الخريطة لوضع دبوس مكان التسليم.", "bg-purple-50 text-purple-800");
+        el.textContent = "اضغط على الخريطة";
+      }
+      updateMapAndPrice();
+    }
     function onMapClick(e) {
-      if (pickup.mode !== "map") return;
-      pickup.coords = [e.latlng.lat, e.latlng.lng]; pickup.src = "map";
-      pickup.label = "نقطة على الخريطة (" + fmtCoords(pickup.coords) + ")";
-      setPickupHint("تم تحديد الموقع: " + fmtCoords(pickup.coords), "bg-purple-50 text-purple-800");
+      const pickWantsMap = pickup.mode === "map", destWantsMap = dest.mode === "map";
+      if (!pickWantsMap && !destWantsMap) return;
+      let target = mapTarget;
+      if (target === "origin" && !pickWantsMap) target = "dest";
+      if (target === "dest" && !destWantsMap) target = "origin";
+      const c = [e.latlng.lat, e.latlng.lng];
+      if (target === "dest") {
+        dest.coords = c; dest.label = "نقطة تسليم على الخريطة (" + fmtCoords(c) + ")";
+        setDestHint("تم تحديد موقع التسليم: " + fmtCoords(c), "bg-purple-50 text-purple-800");
+        const el = document.getElementById("dest-custom"); if (el) el.textContent = dest.label;
+        if (pickWantsMap && !pickup.coords) mapTarget = "origin";
+      } else {
+        pickup.coords = c; pickup.src = "map";
+        pickup.label = "نقطة على الخريطة (" + fmtCoords(c) + ")";
+        setPickupHint("تم تحديد الموقع: " + fmtCoords(c), "bg-purple-50 text-purple-800");
+        if (destWantsMap && !dest.coords) mapTarget = "dest";
+      }
       updateMapAndPrice(); renderOriginLabel();
     }
 
