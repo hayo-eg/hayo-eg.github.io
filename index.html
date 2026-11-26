@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="شحنتك: منصة نقل البضائع والأساطيل عند الطلب في مصر، تسعير فوري وتتبع وتسليم برمز OTP." />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شحنتك | منصة النقل واللوجستيات الذكية عند الطلب</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root { --ease-out: cubic-bezier(.22,.9,.3,1); }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    #map { height: 320px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+    @media print { .no-print { display: none !important; } }
+
+    /* ---------- الحركة والانتقالات ---------- */
+    @keyframes fadeIn { from { opacity: 0; } }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(.6); } }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(18px) scale(.96); } }
+    @keyframes authOut { to { opacity: 0; transform: scale(.98); } }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 14px); } }
+    @keyframes barGrow { from { width: 0; } }
+    @keyframes pulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,.45); } 50% { box-shadow: 0 0 0 6px rgba(249,115,22,0); } }
+    @keyframes priceFlash { 0% { transform: scale(1); } 40% { transform: scale(1.12); color: #fdba74; } 100% { transform: scale(1); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .anim-card { animation: cardIn .45s var(--ease-out) both; }
+    .anim-fade { animation: fadeIn .4s ease both; }
+    .view-enter { animation: fadeSlideUp .35s var(--ease-out); }
+    .app-enter { animation: fadeSlideUp .4s var(--ease-out); }
+    .auth-leave { animation: authOut .28s ease forwards; }
+    .auth-enter { animation: fadeIn .3s ease; }
+    .badge-anim { display: inline-block; animation: popIn .28s var(--ease-out); }
+    .toast-pop { animation: toastIn .3s var(--ease-out); }
+    .price-flash { display: inline-block; animation: priceFlash .5s var(--ease-out); }
+
+    #waybill-modal, #img-modal { animation: fadeIn .2s ease; }
+    #waybill-modal > div, #img-modal > div { animation: modalIn .28s var(--ease-out); }
+
+    /* أزرار: تفاعلات دقيقة */
+    button:not(:disabled) { transition: transform .15s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease, opacity .2s ease; }
+    button:not(:disabled):active { transform: scale(.96); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    a, select, input { transition: border-color .2s ease, box-shadow .2s ease; }
+
+    /* حالة تحميل على الأزرار */
+    .is-loading { pointer-events: none; opacity: .75; }
+    .is-loading::after { content: ""; display: inline-block; width: 1em; height: 1em; margin-inline-start: .5em;
+      border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%;
+      vertical-align: -0.15em; animation: spin .7s linear infinite; }
+
+    /* شريط تقدم الشحنة */
+    .progress-track { height: 6px; background: #e2e8f0; border-radius: 9999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #fb923c, #f97316); border-radius: 9999px;
+      animation: barGrow 1s var(--ease-out); transition: width .8s var(--ease-out); }
+    .progress-steps { display: flex; justify-content: space-between; margin-top: 6px; }
+    .progress-steps .step { font-size: 10px; color: #94a3b8; font-weight: 600; position: relative; padding-top: 10px; }
+    .progress-steps .step::before { content: ""; position: absolute; top: 0; right: 50%; transform: translateX(50%);
+      width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transition: background .3s ease; }
+    .progress-steps .step.done { color: #ea580c; font-weight: 700; }
+    .progress-steps .step.done::before { background: #f97316; }
+    .progress-steps .step.current::before { animation: pulseDot 1.6s ease-in-out infinite; }
+
+    /* احترام تفضيل تقليل الحركة */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body class="text-slate-900">
+
+  <!-- Top Navbar -->
+  <header id="app-header" class="hidden sticky top-0 z-50 bg-slate-900 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center font-extrabold text-xl shadow">ش</div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight">شحنتك <span class="text-orange-400 text-xs font-semibold">LogTech</span></h1>
+          <p class="text-xs text-slate-400">منصة نقل البضائع والأساطيل عند الطلب</p>
+        </div>
+      </div>
+
+      <!-- Role Switcher -->
+      <div id="role-switcher" class="hidden flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-sm">
+        <button onclick="switchRole('shipper')" id="btn-shipper" class="px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-white transition">التاجر / المصنع</button>
+        <button onclick="switchRole('driver')" id="btn-driver" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">السائق</button>
+        <button onclick="switchRole('admin')" id="btn-admin" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">برج العمليات</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2 text-xs">
+        <span id="user-chip" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold"></span>
+        <button id="refresh-btn" onclick="refreshAndRender(true)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300">تحديث</button>
+        <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold">تسجيل الخروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app-main" class="hidden max-w-7xl mx-auto px-4 py-6">
+
+    <!-- ==================== 1. SHIPPER VIEW ==================== -->
+    <section id="view-shipper" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Create Shipment Form -->
+        <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h2 class="font-extrabold text-lg text-slate-800">طلب شحنة جديدة</h2>
+            <span class="text-xs bg-orange-100 text-orange-700 font-bold px-2.5 py-1 rounded-full">تسعير ديناميكي فوري</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">مكان استلام البضاعة</label>
+            <div class="grid grid-cols-3 gap-2 text-xs font-bold" id="pickup-modes">
+              <button type="button" data-mode="preset" onclick="setPickupMode('preset')" class="pm-btn py-2 rounded-xl border">نقاط جاهزة</button>
+              <button type="button" data-mode="current" onclick="setPickupMode('current')" class="pm-btn py-2 rounded-xl border">📍 موقعي الحالي</button>
+              <button type="button" data-mode="map" onclick="setPickupMode('map')" class="pm-btn py-2 rounded-xl border">🗺️ من الخريطة</button>
+            </div>
+            <p id="pickup-hint" class="hidden mt-2 text-xs rounded-lg px-3 py-2"></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div id="origin-wrap">
+              <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التحميل</label>
+              <select id="origin" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+                <option value="10th_ramadan">العاشر من رمضان (المنطقة الصناعية)</option>
+                <option value="6th_october">6 أكتوبر (المنطقة الصناعية)</option>
+                <option value="alex_port">ميناء الإسكندرية</option>
+                <option value="sokhna_port">ميناء العين السخنة</option>
+                <option value="obour">سوق العبور / القليوبية</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التسليم</label>
+              <select id="destination" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+                <option value="new_cairo">القاهرة الجديدة / التجمع الخامس</option>
+                <option value="alex_port">الإسكندرية</option>
+                <option value="mansoura">المنصورة / الدقهلية</option>
+                <option value="assiut">أسيوط (الصعيد)</option>
+                <option value="10th_ramadan">العاشر من رمضان</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">نوع الشاحنة</label>
+              <select id="truckType" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+                <option value="quarter">ربع نقل (حتى 1.5 طن)</option>
+                <option value="jumbo" selected>جامبو (حتى 4.5 طن)</option>
+                <option value="trailer">تريلا / مقطورة (حتى 25 طن)</option>
+                <option value="reefer">ثلاجة مبردة (حتى 5 طن)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">الوزن التقريبي (طن)</label>
+              <input type="number" id="weight" value="3.5" min="0.5" max="30" step="0.5" oninput="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-bold tabular-nums" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">نوع البضاعة</label>
+              <input type="text" id="cargoDesc" value="مواد غذائية معبأة" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">طريقة الدفع (يُتفق عليها مع المنصة)</label>
+              <select id="paymentMethod" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+                <option value="محفظة إلكترونية / انستاباي">انستاباي / فودافون كاش</option>
+                <option value="حساب شركات آجل">حساب شركات (ضمان بنكي)</option>
+                <option value="بطاقة بنكية">بطاقة ائتمان / ميزة</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 p-3 rounded-xl cursor-pointer">
+            <input type="checkbox" id="backhaul" checked onchange="updateMapAndPrice()" class="w-4 h-4 accent-emerald-600" />
+            <div class="text-xs">
+              <span class="font-extrabold text-emerald-800 block">خصم خط العودة (Backhaul -15%)</span>
+              <span class="text-emerald-700">خصم 15% لو المسار مرن وممكن شاحنة عائدة تاخده</span>
+            </div>
+          </label>
+
+          <!-- Fare Breakdown -->
+          <div class="bg-slate-900 text-white rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between text-xs text-slate-400">
+              <span>المسافة التقديرية: <strong id="calc-dist" class="text-white tabular-nums">65 كم</strong></span>
+              <span>الزمن المتوقع: <strong id="calc-time" class="text-white tabular-nums">1 س 15 د</strong></span>
+            </div>
+            <div class="flex justify-between items-baseline pt-2 border-t border-slate-800">
+              <span class="text-sm text-slate-300">التكلفة الإجمالية (شاملة التأمين):</span>
+              <span class="text-2xl font-extrabold text-orange-400 tabular-nums"><span id="calc-price">1,450</span> ج.م</span>
+            </div>
+          </div>
+
+          <button id="create-ship-btn" onclick="createShipment()" class="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm shadow-lg shadow-orange-500/20 transition">
+            تأكيد وحجز الشاحنة الآن ←
+          </button>
+        </div>
+
+        <!-- Map & Active Shipments -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-slate-800 text-sm">خريطة المسار</h3>
+              <span class="text-xs text-emerald-600 font-bold flex items-center gap-1">خريطة المسار</span>
+            </div>
+            <div id="map"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <h3 class="font-extrabold text-slate-800 mb-4">شحناتك النشطة والمكتملة</h3>
+            <div id="shipper-list" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. DRIVER VIEW ==================== -->
+    <section id="view-driver" class="hidden space-y-6">
+      <div id="driver-kyc-banner" class="hidden rounded-2xl p-4 text-sm font-semibold"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="anim-card bg-slate-900 text-white p-5 rounded-2xl flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-400"><span id="driver-title">حالة السائق</span></p>
+            <h3 id="driver-status-text" class="text-lg font-extrabold text-emerald-400 mt-1">متاح لاستقبال الطلبات</h3>
+          </div>
+          <button onclick="toggleDriverOnline()" id="driver-toggle-btn" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">متصل</button>
+        </div>
+        <div class="anim-card bg-white p-5 rounded-2xl border border-slate-200" style="animation-delay:70ms">
+          <p class="text-xs text-slate-500 font-bold">إجمالي أرباحك من الرحلات المسلّمة</p>
+          <p class="text-2xl font-extrabold text-slate-900 tabular-nums mt-1"><span id="driver-wallet">4,850</span> ج.م</p>
+        </div>
+        <div class="anim-card bg-white p-5 rounded-2xl border border-slate-200" style="animation-delay:140ms">
+          <p class="text-xs text-slate-500 font-bold">الرحلات المنفذة / التقييم</p>
+          <p class="text-2xl font-extrabold text-orange-600 tabular-nums mt-1" id="driver-trips-count">12 رحلة</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5">
+          <h3 class="font-extrabold text-slate-800 mb-4">طلبات نقل متاحة بالقرب منك</h3>
+          <div id="driver-available-list" class="space-y-3"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-5">
+          <h3 class="font-extrabold text-slate-800 mb-4">رحلتك الحالية (خطوات التنفيذ ورمز التسليم)</h3>
+          <div id="driver-active-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. ADMIN CONTROL TOWER ==================== -->
+    <section id="view-admin" class="hidden space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="anim-card bg-white p-4 rounded-2xl border border-slate-200" style="animation-delay:0ms">
+          <p class="text-xs text-slate-500 font-bold">إجمالي الشحنات</p>
+          <p id="kpi-total" class="text-2xl font-extrabold text-slate-900 tabular-nums mt-1">0</p>
+        </div>
+        <div class="anim-card bg-white p-4 rounded-2xl border border-slate-200" style="animation-delay:70ms">
+          <p class="text-xs text-slate-500 font-bold">قيد التنفيذ على الطريق</p>
+          <p id="kpi-active" class="text-2xl font-extrabold text-orange-600 tabular-nums mt-1">0</p>
+        </div>
+        <div class="anim-card bg-white p-4 rounded-2xl border border-slate-200" style="animation-delay:140ms">
+          <p class="text-xs text-slate-500 font-bold">حجم التعاملات (GMV)</p>
+          <p id="kpi-gmv" class="text-2xl font-extrabold text-emerald-600 tabular-nums mt-1">0 ج.م</p>
+        </div>
+        <div class="anim-card bg-white p-4 rounded-2xl border border-slate-200" style="animation-delay:210ms">
+          <p class="text-xs text-slate-500 font-bold">صافي عمولة المنصة (12%)</p>
+          <p id="kpi-rev" class="text-2xl font-extrabold text-slate-900 tabular-nums mt-1">0 ج.م</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 overflow-x-auto">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="font-extrabold text-slate-800">برج مراقبة العمليات والأسطول</h3>
+          <input type="text" id="admin-search" oninput="renderAll()" placeholder="بحث برقم الشحنة أو المدينة..." class="border border-slate-300 rounded-xl px-3 py-1.5 text-sm" />
+        </div>
+        <table class="w-full text-right text-sm">
+          <thead class="bg-slate-100 text-slate-600 text-xs">
+            <tr>
+              <th class="p-3 rounded-r-xl">رقم الشحنة</th>
+              <th class="p-3">المسار</th>
+              <th class="p-3">الشاحنة / الوزن</th>
+              <th class="p-3">القيمة</th>
+                            <th class="p-3 rounded-l-xl">الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+        <h3 class="font-extrabold">ترقية مستخدم لمدير</h3>
+        <form id="add-admin-form" class="flex flex-wrap gap-2 items-center" onsubmit="return addAdmin(event)">
+          <input id="aa-user" required dir="ltr" placeholder="رقم جوال أو إيميل المستخدم المسجّل" class="flex-1 min-w-[220px] border border-slate-300 rounded-xl px-3 py-2 text-sm" />
+          <button class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm">ترقية لمدير</button>
+        </form>
+        <p class="text-xs text-slate-500">لازم المستخدم يكون سجّل حساب قبل كده (تاجر). السائقين لا يمكن ترقيتهم.</p>
+        <p id="aa-msg" class="hidden text-xs font-bold"></p>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between"><h3 class="font-extrabold">إدارة المستخدمين</h3><span id="users-count" class="text-xs text-slate-500"></span></div>
+        <table class="w-full text-sm text-right">
+          <thead class="bg-slate-50 text-slate-500 text-xs"><tr><th class="p-3">الاسم</th><th class="p-3">الجوال / اسم المستخدم</th><th class="p-3">الدور</th><th class="p-3">الحالة</th><th class="p-3">إجراء</th></tr></thead>
+          <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
+        <div class="p-4 border-b border-slate-100">
+          <div class="flex items-center justify-between"><h3 class="font-extrabold">مراجعة وثائق السائقين</h3><span id="kyc-count" class="text-xs text-slate-500"></span></div>
+          <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">لا يستطيع السائق قبول رحلات قبل اعتماد الوثائق. الصور محفوظة في تخزين خاص ولا تُعرض إلا للإدارة.</p>
+        </div>
+        <table class="w-full text-sm text-right">
+          <thead class="bg-slate-50 text-slate-500 text-xs"><tr><th class="p-3">السائق</th><th class="p-3">من</th><th class="p-3">رقم اللوحة</th><th class="p-3">الوثائق</th><th class="p-3">الحالة</th><th class="p-3">إجراء</th></tr></thead>
+          <tbody id="kyc-table-body" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+  <footer id="app-footer" class="hidden max-w-7xl mx-auto px-4 pb-8 text-xs text-slate-400 text-center no-print"><a href="privacy.html" class="underline">سياسة الخصوصية</a> · <a href="terms.html" class="underline">الشروط والأحكام</a></footer>
+
+  <!-- Image viewer -->
+  <div id="img-modal" class="hidden fixed inset-0 bg-slate-900/80 z-[70] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+    <div class="max-w-2xl w-full text-center">
+      <p id="img-modal-title" class="text-white font-bold mb-2"></p>
+      <img id="img-modal-img" alt="" class="max-h-[80vh] mx-auto rounded-xl bg-white" />
+    </div>
+  </div>
+
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-600">
+    <div class="anim-card w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-orange-500 text-white flex items-center justify-center font-extrabold text-2xl shadow">ش</div>
+        <h2 class="mt-3 text-2xl font-extrabold">شحنتك</h2>
+        <p class="text-sm text-slate-500">منصة النقل واللوجستيات الذكية عند الطلب</p>
+      </div>
+      <div class="flex bg-slate-100 p-1 rounded-xl mb-5 text-sm font-bold">
+        <button id="tab-login" type="button" onclick="authTab('login')" class="flex-1 py-2 rounded-lg">تسجيل الدخول</button>
+        <button id="tab-register" type="button" onclick="authTab('register')" class="flex-1 py-2 rounded-lg">حساب جديد</button>
+      </div>
+      <form id="login-form" class="space-y-3" onsubmit="return doLogin(event)">
+        <input id="l-id" required autocomplete="username" placeholder="رقم الجوال أو الإيميل" dir="ltr" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <input id="l-pass" type="password" autocomplete="current-password" placeholder="كلمة المرور" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-2.5 rounded-xl">دخول</button>
+      </form>
+      <form id="register-form" class="space-y-3 hidden" onsubmit="return doRegister(event)">
+        <input id="r-name" required placeholder="الاسم بالكامل" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <input id="r-phone" required inputmode="tel" placeholder="رقم الجوال (01xxxxxxxxx) أو الإيميل" dir="ltr" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <select id="r-role" onchange="toggleDriverFields()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 bg-white">
+          <option value="shipper">تاجر / مصنع (أطلب شحنات)</option>
+          <option value="driver">سائق (أنقل شحنات)</option>
+        </select>
+        <input id="r-pass" type="password" required minlength="6" autocomplete="new-password" placeholder="كلمة المرور (6 أحرف على الأقل)" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <input id="r-pass2" type="password" required autocomplete="new-password" placeholder="تأكيد كلمة المرور" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+        <div id="driver-fields" class="hidden space-y-3 border-t pt-3">
+          <p class="text-xs font-extrabold text-slate-700">توثيق السائق (مطلوب لاعتماد الحساب)</p>
+          <input id="r-from" list="gov-list" placeholder="بلد السائق / المحافظة (مثال: المنصورة)" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+          <datalist id="gov-list"><option value="القاهرة"><option value="الجيزة"><option value="الإسكندرية"><option value="القليوبية"><option value="الشرقية"><option value="الدقهلية"><option value="الغربية"><option value="المنوفية"><option value="البحيرة"><option value="الإسماعيلية"><option value="السويس"><option value="بورسعيد"><option value="الفيوم"><option value="بني سويف"><option value="المنيا"><option value="أسيوط"><option value="سوهاج"><option value="قنا"><option value="الأقصر"><option value="أسوان"></datalist>
+          <input id="r-plate" placeholder="رقم لوحة السيارة (مثال: أ ب ج 4521)" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+          <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة البطاقة</span><img id="pv-id" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-id" class="block text-2xl text-slate-300">🪪</span><input id="r-idphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-id','ph-id')" /></label>
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة وجهك</span><img id="pv-face" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-face" class="block text-2xl text-slate-300">🙂</span><input id="r-facephoto" type="file" accept="image/*" capture="user" class="hidden" onchange="previewPhoto(this,'pv-face','ph-face')" /></label>
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة العربية</span><img id="pv-car" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-car" class="block text-2xl text-slate-300">🚚</span><input id="r-carphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-car','ph-car')" /></label>
+          </div>
+          <label class="flex items-start gap-2 text-xs text-slate-600"><input id="r-consent" type="checkbox" class="mt-0.5 accent-orange-500" /><span>أوافق على استخدام صورة بطاقتي ووجهي وسيارتي للتحقق من هويتي فقط، ومراجعتها من إدارة المنصة، وعلى <a href="privacy.html" target="_blank" class="underline">سياسة الخصوصية</a> و<a href="terms.html" target="_blank" class="underline">الشروط</a>.</span></label>
+        </div>
+        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-2.5 rounded-xl">إنشاء الحساب</button>
+      </form>
+      
+      <p id="cfg-warn" class="hidden mt-3 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center">لم يتم ضبط Supabase بعد. افتح index.html وضع SUPABASE_URL و SUPABASE_ANON_KEY.</p>
+      <p id="auth-error" class="hidden mt-3 text-sm text-red-600 font-semibold text-center" role="alert"></p>
+      <p class="mt-4 text-xs text-slate-400 text-center"><a href="privacy.html" class="underline">سياسة الخصوصية</a> · <a href="terms.html" class="underline">الشروط والأحكام</a></p>
+    </div>
+  </div>
+
+  <!-- Waybill Print Modal -->
+  <div id="waybill-modal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-extrabold text-lg">بوليصة شحن إلكترونية (e-Waybill)</h3>
+        <button onclick="closeWaybill()" class="text-slate-400 hover:text-slate-700 font-bold text-xl">×</button>
+      </div>
+      <div id="waybill-content" class="space-y-3 text-sm"></div>
+      <div class="flex gap-3 pt-3 border-t no-print">
+        <button onclick="window.print()" class="flex-1 py-2.5 rounded-xl bg-slate-900 text-white font-bold">طباعة / حفظ PDF</button>
+        <button onclick="closeWaybill()" class="px-4 py-2.5 rounded-xl border border-slate-300 font-bold">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LOCATIONS = {
+      "10th_ramadan": { name: "العاشر من رمضان", coords: [30.2965, 31.7416] },
+      "6th_october": { name: "6 أكتوبر", coords: [29.9285, 30.9188] },
+      "alex_port": { name: "الإسكندرية", coords: [31.2001, 29.9187] },
+      "sokhna_port": { name: "العين السخنة", coords: [29.6002, 32.3167] },
+      "obour": { name: "سوق العبور", coords: [30.2283, 31.4799] },
+      "new_cairo": { name: "القاهرة الجديدة", coords: [30.0074, 31.4913] },
+      "mansoura": { name: "المنصورة", coords: [31.0409, 31.3785] },
+      "assiut": { name: "أسيوط", coords: [27.1783, 31.1859] }
+    };
+
+    const TRUCK_RATES = {
+      quarter: { label: "ربع نقل", base: 450, perKm: 11 },
+      jumbo: { label: "جامبو", base: 750, perKm: 16 },
+      trailer: { label: "تريلا", base: 1800, perKm: 28 },
+      reefer: { label: "ثلاجة مبردة", base: 1100, perKm: 22 }
+    };
+
+    const STATUS_MAP = {
+      requested: { label: "بانتظار سائق", color: "bg-amber-100 text-amber-800" },
+      assigned: { label: "تم تعيين السائق", color: "bg-blue-100 text-blue-800" },
+      in_transit: { label: "في الطريق للتسليم", color: "bg-purple-100 text-purple-800" },
+      delivered: { label: "تم التسليم بنجاح", color: "bg-emerald-100 text-emerald-800" },
+      cancelled: { label: "ملغاة", color: "bg-slate-200 text-slate-600" }
+    };
+
+
+    /* ===================== إعدادات Supabase (ضع قيمك هنا) ===================== */
+    // الـ anon key مفتاح عام مصمم يظهر في المتصفح، والحماية الفعلية من سياسات RLS في schema.sql.
+    // ممنوع تضع هنا service_role key أبدًا.
+    const SUPABASE_URL = "https://nolbzqvgzlwvprihujri.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vbGJ6cXZnemx3dnByaWh1anJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2ODY3MzAsImV4cCI6MjExMTI2MjczMH0.iz9oIDqnu-Bb4F7Y52b9zEHvjqJgH2TsMiKdS6tgZGQ";
+    /* ========================================================================= */
+
+    const CONFIGURED = !/PASTE_YOUR/.test(SUPABASE_URL + SUPABASE_ANON_KEY);
+    const sb = (CONFIGURED && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    const PHONE_DOMAIN = "phone.shahntak.app";
+    const COMMISSION = 0.12;
+    const ROLE_LABEL = { admin: "مدير النظام", shipper: "تاجر", driver: "سائق" };
+    let currentRole = "shipper", me = null, mapReady = false, pollTimer = null;
+    let data = { shipments: [], profiles: [], kycs: [], secrets: {} };
+    let driverOnline = true;
+
+    const fmt = n => Number(n || 0).toLocaleString("en-US");
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+    function setHTML(el, html) { if (el.__lastHTML !== html) { el.innerHTML = html; el.__lastHTML = html; } }
+    let toastTimer;
+    function toast(msg) {
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast"; el.setAttribute("role", "status");
+        el.className = "fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-sm font-semibold px-5 py-3 rounded-xl shadow-2xl max-w-[90vw] text-center no-print toast-pop";
+        document.body.appendChild(el);
+      }
+      el.innerText = msg; el.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 4000);
+    }
+    function errMsg(e) { return (e && e.message) ? e.message : "حصل خطأ. جرّب مرة أخرى."; }
+    let map, routeLine, originMarker, destMarker;
+    function initMap() {
+      map = L.map('map').setView([30.2, 31.3], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      map.on("click", onMapClick);
+      setPickupMode(pickup.mode);
+    }
+
+    /* ---------- صور: ضغط وتحويل إلى Blob ---------- */
+    function readImage(file, max) {
+      max = max || 900;
+      return new Promise((resolve, reject) => {
+        if (!file || !/^image\//.test(file.type)) return reject(new Error("not-image"));
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode")); };
+        img.onload = () => {
+          const r = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.max(1, Math.round(img.width * r)); c.height = Math.max(1, Math.round(img.height * r));
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          c.toBlob(b => b ? resolve({ blob: b, dataUrl: c.toDataURL("image/jpeg", 0.7) }) : reject(new Error("blob")), "image/jpeg", 0.7);
+        };
+        img.src = url;
+      });
+    }
+    const signedCache = {};
+    async function signedUrl(bucket, path) {
+      const k = bucket + "/" + path;
+      if (signedCache[k] && signedCache[k].exp > Date.now()) return signedCache[k].url;
+      const { data: d, error } = await sb.storage.from(bucket).createSignedUrl(path, 300);
+      if (error) throw error;
+      signedCache[k] = { url: d.signedUrl, exp: Date.now() + 240000 };
+      return d.signedUrl;
+    }
+    async function viewPrivate(bucket, path, title) {
+      try { viewImage(await signedUrl(bucket, path), title); } catch (e) { toast("تعذر فتح الصورة"); }
+    }
+    function viewImage(src, title) {
+      document.getElementById("img-modal-img").src = src;
+      document.getElementById("img-modal-title").textContent = title || "";
+      document.getElementById("img-modal").classList.remove("hidden");
+    }
+    async function hydrateGoodsImgs() {
+      for (const el of document.querySelectorAll("img[data-goods]")) {
+        if (el.dataset.done) continue; el.dataset.done = "1";
+        try { el.src = await signedUrl("goods", el.dataset.goods); } catch (e) {}
+      }
+    }
+
+    /* ---------- تحميل البيانات (RLS بتفلتر حسب الدور) ---------- */
+    async function loadData() {
+      if (!me) return;
+      const [sh, pr, kc, sc] = await Promise.all([
+        sb.from("shipments").select("*").order("created_at", { ascending: false }).limit(500),
+        sb.from("profiles").select("*"),
+        sb.from("driver_kyc").select("*"),
+        sb.from("shipment_secrets").select("*")
+      ]);
+      const bad = [sh, pr, kc, sc].find(r => r.error);
+      if (bad) { toast("تعذر تحميل البيانات: " + errMsg(bad.error)); return; }
+      data.shipments = sh.data; data.profiles = pr.data; data.kycs = kc.data;
+      data.secrets = {}; sc.data.forEach(x => data.secrets[x.shipment_id] = x.otp);
+      const mine = data.profiles.find(p => p.id === me.id); if (mine) me = mine;
+    }
+    async function refreshAndRender(manual) {
+      const rbtn = document.getElementById("refresh-btn");
+      if (rbtn) rbtn.classList.add("is-loading");
+      try { await loadData(); renderAll(); if (manual) toast("تم التحديث"); }
+      finally { if (rbtn) rbtn.classList.remove("is-loading"); }
+    }
+    function startPolling() {
+      clearInterval(pollTimer);
+      pollTimer = setInterval(() => {
+        const a = document.activeElement;
+        if (a && a.matches && a.matches("#driver-active-list input, #admin-search, input[type=file]")) return;
+        refreshAndRender(false);
+      }, 20000);
+    }
+
+    const profileOf = id => data.profiles.find(p => p.id === id);
+    const kycOf = id => data.kycs.find(k => k.driver_id === id);
+    function driverLabel(id) {
+      if (!id) return "لم يُعيَّن بعد";
+      const p = profileOf(id), k = kycOf(id);
+      return p ? p.name + (k ? " (" + k.plate + ")" : "") : "سائق";
+    }
+    function driverApproved() { if (!me) return false; const k = kycOf(me.id); return me.role === "admin" || !!(k && k.status === "approved"); }
+
+    /* ---------- عمليات الشحنات ---------- */
+    async function rpc(name, args, okMsg) {
+      const { error } = await sb.rpc(name, args);
+      if (error) { toast(errMsg(error)); await refreshAndRender(false); return false; }
+      if (okMsg) toast(okMsg);
+      await refreshAndRender(false); return true;
+    }
+    async function createShipment() {
+      const cbtn = document.getElementById("create-ship-btn");
+      if (cbtn) { cbtn.disabled = true; cbtn.classList.add("is-loading"); }
+      try {
+      const oKey = pickup.mode === "preset" ? document.getElementById("origin").value : "custom";
+      const dKey = document.getElementById("destination").value;
+      if (oKey !== "custom" && oKey === dKey) return toast("يرجى اختيار نقطة تسليم مختلفة عن نقطة التحميل.");
+      if (oKey === "custom" && !pickup.coords) return toast(pickup.mode === "current" ? "حدد موقعك الحالي أولاً أو اختر نقطة من الخريطة." : "اضغط على الخريطة لتحديد مكان الاستلام أولاً.");
+      const row = {
+        shipper_id: me.id, origin_key: oKey,
+        origin_lat: oKey === "custom" ? pickup.coords[0] : null,
+        origin_lng: oKey === "custom" ? pickup.coords[1] : null,
+        origin_label: oKey === "custom" ? pickup.label : null,
+        pickup_mode: pickup.mode, dest_key: dKey,
+        truck_key: document.getElementById("truckType").value,
+        weight: Math.min(30, Math.max(0.5, parseFloat(document.getElementById("weight").value) || 1)),
+        cargo: document.getElementById("cargoDesc").value.trim().slice(0, 120) || "بضائع عامة",
+        payment: document.getElementById("paymentMethod").value,
+        backhaul: document.getElementById("backhaul").checked
+      };
+      const { data: s, error } = await sb.from("shipments").insert(row).select().single();
+      if (error) return toast(errMsg(error));
+      await refreshAndRender(false);
+      toast("تم إنشاء الشحنة " + s.id + " بسعر " + fmt(s.price) + " ج.م." + (s.pickup_mode === "map" ? " سيرسل لك السائق صورة البضاعة للتأكيد." : ""));
+      } finally { if (cbtn) { cbtn.disabled = false; cbtn.classList.remove("is-loading"); } }
+    }
+    const acceptShipment = id => { if (!driverOnline) return toast("يرجى تفعيل وضع (متصل) أولاً لاستقبال الطلبات."); return rpc("accept_shipment", { p_id: id }, "تم قبول الشحنة " + id + ". توجه لنقطة التحميل."); };
+    const startTrip = id => rpc("start_trip", { p_id: id }, "بدأت الرحلة. رحلة آمنة يا كابتن!");
+    async function confirmDelivery(id) {
+      const input = document.getElementById("otp-" + id);
+      const code = input ? input.value.trim() : "";
+      if (!/^\d{4}$/.test(code)) { if (input) input.classList.add("border-red-500"); return toast("اكتب رمز التسليم (4 أرقام)."); }
+      await rpc("confirm_delivery", { p_id: id, p_code: code }, "تم التسليم بنجاح!");
+    }
+    function cancelShipment(id) { if (confirm("إلغاء هذه الشحنة؟")) rpc("cancel_shipment", { p_id: id }, "تم إلغاء الشحنة."); }
+    const rateShipment = (id, n) => rpc("rate_shipment", { p_id: id, p_stars: n }, "شكرًا على تقييمك.");
+    const reviewGoods = (id, ok) => rpc("review_goods", { p_id: id, p_ok: ok }, ok ? "تم تأكيد البضاعة. يقدر السائق يبدأ الرحلة." : "تم رفض الصورة. هيتطلب من السائق صورة جديدة.");
+    async function submitGoodsPhoto(id) {
+      const inp = document.getElementById("gp-" + id);
+      if (!inp || !inp.files[0]) return toast("صوّر البضاعة أولاً.");
+      let img; try { img = await readImage(inp.files[0], 900); } catch (e) { return toast("تعذر قراءة الصورة. جرّب صورة أخرى."); }
+      const path = id + "/" + Date.now() + ".jpg";
+      const up = await sb.storage.from("goods").upload(path, img.blob, { contentType: "image/jpeg" });
+      if (up.error) return toast("تعذر رفع الصورة: " + errMsg(up.error));
+      await rpc("driver_submit_goods", { p_id: id, p_path: path }, "تم إرسال صورة البضاعة للعميل. بانتظار تأكيده.");
+    }
+    function toggleDriverOnline() { driverOnline = !driverOnline; renderAll(); }
+
+    function switchRole(role) {
+      if (!me) return;
+      if (me.role !== "admin") role = me.role;
+      currentRole = role;
+      ["shipper", "driver", "admin"].forEach(r => {
+        document.getElementById("view-" + r).classList.toggle("hidden", r !== role);
+        document.getElementById("btn-" + r).className = "px-3 py-1.5 rounded-lg font-bold transition " + (r === role ? "bg-orange-500 text-white" : "text-slate-300 hover:text-white");
+      });
+      const vEl = document.getElementById("view-" + role);
+      if (vEl) { vEl.classList.remove("view-enter"); void vEl.offsetWidth; vEl.classList.add("view-enter"); }
+      if (role === "shipper" && map) setTimeout(() => { map.invalidateSize(); updateMapAndPrice(); }, 50);
+      renderAll();
+    }
+
+    /* ---------- العرض ---------- */
+    const STATUS_STEPS = [["requested", "الطلب"], ["assigned", "التعيين"], ["in_transit", "في الطريق"], ["delivered", "التسليم"]];
+    function progressTimeline(s) {
+      if (s.status === "cancelled") return "";
+      const idx = Math.max(0, STATUS_STEPS.findIndex(x => x[0] === s.status));
+      const pct = Math.round(((idx + 1) / STATUS_STEPS.length) * 100);
+      return '<div class="mt-2">' +
+        '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="progress-steps">' + STATUS_STEPS.map((st, i) =>
+          '<span class="step' + (i <= idx ? ' done' : '') + (i === idx && s.status !== 'delivered' ? ' current' : '') + '">' + st[1] + '</span>').join("") +
+        '</div></div>';
+    }
+
+    function statusBadge(st) { const m = STATUS_MAP[st] || STATUS_MAP.requested; return '<span class="badge-anim text-xs font-bold px-2.5 py-1 rounded-full ' + m.color + '">' + m.label + '</span>'; }
+    function originName(s) { return s.origin_key === "custom" ? (s.origin_label || "موقع محدد") : (LOCATIONS[s.origin_key] || {}).name || ""; }
+    function destName(s) { return (LOCATIONS[s.dest_key] || {}).name || ""; }
+    function truckLabel(s) { return (TRUCK_RATES[s.truck_key] || {}).label || ""; }
+    function mapsLink(s) {
+      if (s.origin_key !== "custom" || s.origin_lat == null) return "";
+      return '<a href="https://www.google.com/maps?q=' + Number(s.origin_lat) + ',' + Number(s.origin_lng) + '" target="_blank" rel="noopener" class="text-xs text-blue-600 underline">فتح موقع الاستلام في الخرائط</a>';
+    }
+    function pickupBadge(s) {
+      if (s.pickup_mode === "map") return '<span class="text-[11px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">🗺️ استلام من الخريطة (صورة إلزامية)</span>';
+      if (s.pickup_mode === "current") return '<span class="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">📍 من موقع العميل</span>';
+      return "";
+    }
+    const routeText = s => esc(originName(s)) + " ← " + esc(destName(s));
+    const emptyBox = t => '<div class="anim-fade text-center text-sm text-slate-400 py-8 border border-dashed border-slate-200 rounded-xl">' + t + '</div>';
+    const stars = n => "★".repeat(n) + "☆".repeat(5 - n);
+
+    function goodsBlockShipper(s) {
+      if (s.pickup_mode !== "map" || s.status === "cancelled") return "";
+      if (s.goods_status === "pending" && s.goods_photo_path)
+        return '<div class="bg-purple-50 border border-purple-200 rounded-xl p-3 space-y-2"><p class="text-xs font-bold text-purple-800">السائق أرسل صورة البضاعة. تأكد إنها بضاعتك قبل بدء الرحلة:</p>' +
+          '<img data-goods="' + esc(s.goods_photo_path) + '" alt="صورة البضاعة" onclick="viewImage(this.src,\'صورة البضاعة\')" class="w-full max-h-48 object-cover rounded-lg cursor-zoom-in bg-slate-100" />' +
+          '<div class="flex gap-2"><button onclick="reviewGoods(\'' + esc(s.id) + '\', true)" class="flex-1 py-2 rounded-lg bg-emerald-600 text-white text-xs font-extrabold">البضاعة سليمة، أؤكد</button>' +
+          '<button onclick="reviewGoods(\'' + esc(s.id) + '\', false)" class="flex-1 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 text-xs font-extrabold">ارفض واطلب صورة جديدة</button></div></div>';
+      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">✅ أكدت صورة البضاعة</div>';
+      if (s.goods_status === "rejected") return '<div class="text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2">رفضت الصورة السابقة. بانتظار صورة جديدة من السائق.</div>';
+      if (s.status === "delivered") return "";
+      return '<div class="text-xs text-purple-800 bg-purple-50 rounded-lg px-3 py-2">الاستلام من نقطة على الخريطة: السائق لازم يرسل لك صورة البضاعة وتأكدها قبل التحميل.</div>';
+    }
+    function goodsBlockDriver(s) {
+      if (s.pickup_mode !== "map") return "";
+      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">✅ العميل أكد البضاعة</div>';
+      if (s.goods_status === "pending") return '<div class="text-xs font-bold text-amber-700 bg-amber-50 rounded-lg px-3 py-2">تم إرسال الصورة. بانتظار تأكيد العميل...</div>';
+      return (s.goods_status === "rejected" ? '<div class="text-xs font-bold text-red-700 bg-red-50 rounded-lg px-3 py-2">العميل رفض الصورة. صوّر البضاعة مرة أخرى بوضوح.</div>' : '') +
+        '<div class="space-y-2"><p class="text-xs text-slate-600">الطلب من نقطة على الخريطة: أرسل للعميل صورة للبضاعة لتأكيدها قبل بدء الرحلة.</p>' +
+        '<div class="flex gap-2"><input id="gp-' + esc(s.id) + '" type="file" accept="image/*" capture="environment" class="flex-1 text-xs border border-slate-300 rounded-xl p-1.5" />' +
+        '<button onclick="submitGoodsPhoto(\'' + esc(s.id) + '\')" class="px-3 rounded-xl bg-slate-900 text-white text-xs font-extrabold">إرسال للعميل</button></div></div>';
+    }
+
+    function renderShipperList() {
+      const el = document.getElementById("shipper-list");
+      const list = data.shipments.filter(s => s.shipper_id === me.id);
+      if (!list.length) { setHTML(el, emptyBox("لا توجد شحنات بعد. احجز شاحنتك الأولى.")); return; }
+      setHTML(el, list.map((s, i) => {
+        const live = s.status !== "delivered" && s.status !== "cancelled";
+        const otpBox = live && data.secrets[s.id] ? '<span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-lg">رمز التسليم للمستلم: <strong class="tabular-nums">' + esc(data.secrets[s.id]) + '</strong></span>' : "";
+        const cancelBtn = (s.status === "requested" || s.status === "assigned") ? '<button onclick="cancelShipment(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 border border-red-200 font-bold">إلغاء الشحنة</button>' : "";
+        let rate = "";
+        if (s.status === "delivered") rate = s.rating ? '<div class="text-sm text-amber-500 font-bold">تقييمك: ' + stars(s.rating) + '</div>' :
+          '<div class="flex items-center gap-1 text-xs"><span class="text-slate-600 font-bold">قيّم السائق:</span>' + [1,2,3,4,5].map(n => '<button onclick="rateShipment(\'' + esc(s.id) + '\',' + n + ')" class="text-xl text-amber-400 hover:text-amber-500" aria-label="' + n + ' نجوم">★</button>').join("") + '</div>';
+        return '<div class="anim-card transition duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-slate-200 rounded-xl p-4 space-y-2" style="animation-delay:' + Math.min(i * 70, 420) + 'ms">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' + statusBadge(s.status) + '</div>' +
+          '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) + progressTimeline(s) +
+          '<div class="text-xs text-slate-500">' + esc(truckLabel(s)) + ' · ' + esc(s.weight) + ' طن · ' + esc(s.cargo) + '</div>' +
+          '<div class="text-xs text-slate-500">السائق: ' + esc(driverLabel(s.driver_id)) + '</div>' + goodsBlockShipper(s) + rate +
+          '<div class="flex flex-wrap items-center justify-between gap-2 pt-1"><span class="font-extrabold text-orange-600 tabular-nums">' + fmt(s.price) + ' ج.م</span>' + otpBox +
+          '<span class="flex gap-2">' + cancelBtn + '<button onclick="openWaybill(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold">عرض البوليصة</button></span></div></div>';
+      }).join(""));
+    }
+
+    function renderDriverBanner() {
+      const el = document.getElementById("driver-kyc-banner"), t = document.getElementById("driver-title");
+      if (me.role !== "driver") { el.classList.add("hidden"); t.textContent = "حالة السائق"; return; }
+      t.textContent = "حالة السائق (" + driverLabel(me.id) + ")";
+      const k = kycOf(me.id), st = k ? k.status : "missing";
+      const m = { approved: ["bg-emerald-50 text-emerald-800 border border-emerald-200", "✅ تم اعتماد وثائقك. تقدر تقبل الرحلات."],
+        pending: ["bg-amber-50 text-amber-800 border border-amber-200", "⏳ وثائقك قيد المراجعة من الإدارة. هتقدر تقبل رحلات بعد الاعتماد."],
+        rejected: ["bg-red-50 text-red-700 border border-red-200", "❌ تم رفض وثائقك. تواصل مع الإدارة."],
+        missing: ["bg-red-50 text-red-700 border border-red-200", "لا توجد وثائق على حسابك. تواصل مع الإدارة."] }[st];
+      el.className = "rounded-2xl p-4 text-sm font-semibold " + m[0]; el.textContent = m[1];
+    }
+
+    function renderDriver() {
+      const online = driverOnline;
+      const st = document.getElementById("driver-status-text");
+      st.innerText = online ? "متاح لاستقبال الطلبات" : "غير متصل";
+      st.className = "text-lg font-extrabold mt-1 " + (online ? "text-emerald-400" : "text-slate-400");
+      const btn = document.getElementById("driver-toggle-btn");
+      btn.innerText = online ? "متصل" : "غير متصل";
+      btn.className = "px-4 py-2 rounded-xl font-extrabold text-xs " + (online ? "bg-emerald-500 text-slate-950" : "bg-slate-600 text-white");
+      renderDriverBanner();
+      const done = data.shipments.filter(s => s.driver_id === me.id && s.status === "delivered");
+      const rated = done.filter(s => s.rating);
+      document.getElementById("driver-wallet").innerText = fmt(done.reduce((a, s) => a + (s.earning || 0), 0));
+      document.getElementById("driver-trips-count").innerText = done.length + " رحلة" + (rated.length ? " · ⭐ " + (rated.reduce((a, s) => a + s.rating, 0) / rated.length).toFixed(1) : "");
+
+      const avail = document.getElementById("driver-available-list");
+      const open = data.shipments.filter(s => s.status === "requested");
+      if (!online) setHTML(avail, emptyBox("أنت غير متصل. فعّل وضع (متصل) لعرض الطلبات."));
+      else if (!driverApproved()) setHTML(avail, emptyBox("الطلبات المتاحة تظهر بعد اعتماد وثائقك."));
+      else if (!open.length) setHTML(avail, emptyBox("لا توجد طلبات متاحة الآن."));
+      else setHTML(avail, open.map((s, i) =>
+        '<div class="anim-card transition duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-slate-200 rounded-xl p-4 space-y-2" style="animation-delay:' + Math.min(i * 70, 420) + 'ms">' +
+          '<div class="flex justify-between"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' +
+          '<span class="font-extrabold text-emerald-600 tabular-nums">' + fmt(Math.round(s.price * (1 - COMMISSION))) + ' ج.م</span></div>' +
+          '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) +
+          '<div class="text-xs text-slate-500">' + esc(truckLabel(s)) + ' · ' + esc(s.weight) + ' طن · ' + esc(s.distance) + ' كم · ' + esc(s.cargo) + '</div>' +
+          '<button onclick="acceptShipment(\'' + esc(s.id) + '\')" class="w-full py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm">قبول الرحلة</button></div>').join(""));
+
+      const act = document.getElementById("driver-active-list");
+      const mine = data.shipments.filter(s => s.driver_id === me.id && (s.status === "assigned" || s.status === "in_transit"));
+      if (!mine.length) setHTML(act, emptyBox("لا توجد رحلة جارية. اقبل طلباً من القائمة."));
+      else setHTML(act, mine.map((s, i) => {
+        const locked = s.pickup_mode === "map" && s.goods_status !== "approved";
+        const step = s.status === "assigned"
+          ? goodsBlockDriver(s) + '<button ' + (locked ? 'disabled ' : '') + 'onclick="startTrip(\'' + esc(s.id) + '\')" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-sm disabled:opacity-40 disabled:cursor-not-allowed">' + (locked ? 'بانتظار تأكيد العميل للبضاعة' : 'تم التحميل، ابدأ الرحلة') + '</button>'
+          : '<div class="flex gap-2"><input id="otp-' + esc(s.id) + '" type="text" inputmode="numeric" maxlength="4" placeholder="رمز التسليم (4 أرقام)" class="flex-1 border border-slate-300 rounded-xl p-2 text-sm tabular-nums text-center" />' +
+            '<button onclick="confirmDelivery(\'' + esc(s.id) + '\')" class="px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm">تأكيد التسليم</button></div>';
+        return '<div class="anim-card transition duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-slate-200 rounded-xl p-4 space-y-2" style="animation-delay:' + Math.min(i * 70, 420) + 'ms">' +
+          '<div class="flex justify-between items-center"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' + statusBadge(s.status) + '</div>' +
+          '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) + mapsLink(s) + progressTimeline(s) +
+          '<div class="text-xs text-slate-500">' + esc(s.cargo) + ' · ' + esc(s.weight) + ' طن</div>' + step + '</div>';
+      }).join(""));
+    }
+
+    function renderAdmin() {
+      const all = data.shipments, live = all.filter(s => s.status !== "cancelled"), done = all.filter(s => s.status === "delivered");
+      document.getElementById("kpi-total").innerText = all.length;
+      document.getElementById("kpi-active").innerText = all.filter(s => s.status === "assigned" || s.status === "in_transit").length;
+      document.getElementById("kpi-gmv").innerText = fmt(live.reduce((a, s) => a + s.price, 0)) + " ج.م";
+      document.getElementById("kpi-rev").innerText = fmt(Math.round(done.reduce((a, s) => a + s.price, 0) * COMMISSION)) + " ج.م";
+      const q = document.getElementById("admin-search").value.trim().toLowerCase();
+      const rows = all.filter(s => !q || (s.id + " " + originName(s) + " " + destName(s)).toLowerCase().includes(q));
+      setHTML(document.getElementById("admin-table-body"), rows.length ? rows.map((s, i) =>
+        '<tr class="anim-fade hover:bg-slate-50 transition-colors" style="animation-delay:' + Math.min(i * 40, 400) + 'ms"><td class="p-3 font-bold tabular-nums"><button onclick="openWaybill(\'' + esc(s.id) + '\')" class="underline decoration-dotted">' + esc(s.id) + '</button></td>' +
+        '<td class="p-3">' + routeText(s) + (s.pickup_mode !== "preset" ? '<div class="mt-1">' + pickupBadge(s) + '</div>' : '') + '</td>' +
+        '<td class="p-3">' + esc(truckLabel(s)) + ' / ' + esc(s.weight) + ' طن</td>' +
+        '<td class="p-3 tabular-nums font-semibold">' + fmt(s.price) + ' ج.م</td>' +
+        '<td class="p-3">' + statusBadge(s.status) + (s.rating ? ' <span class="text-amber-500 text-xs">' + stars(s.rating) + '</span>' : '') + '</td></tr>').join("")
+        : '<tr><td colspan="5" class="p-6 text-center text-slate-400">لا توجد نتائج مطابقة.</td></tr>');
+      renderUsers();
+    }
+
+    const KYC_LABEL = { pending: '<span class="text-amber-600 font-bold">قيد المراجعة</span>', approved: '<span class="text-emerald-600 font-bold">معتمد</span>', rejected: '<span class="text-red-600 font-bold">مرفوض</span>' };
+    function renderUsers() {
+      renderKyc();
+      const body = document.getElementById("users-table-body");
+      document.getElementById("users-count").textContent = data.profiles.length + " مستخدم";
+      setHTML(body, data.profiles.map((u, i) => {
+        const self = u.id === me.id;
+        const act = self ? '<span class="text-xs text-slate-400">أنت</span>' :
+          '<button onclick="toggleUser(\'' + esc(u.id) + '\',' + (!u.active) + ')" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 font-bold">' + (u.active ? "إيقاف" : "تفعيل") + '</button>';
+        return '<tr class="anim-fade" style="animation-delay:' + Math.min(i * 40, 400) + 'ms"><td class="p-3 font-semibold">' + esc(u.name) + '</td><td class="p-3 tabular-nums" dir="ltr">' + esc(u.login_id) + '</td><td class="p-3">' + esc(ROLE_LABEL[u.role]) + '</td><td class="p-3">' +
+          (u.active ? '<span class="text-emerald-600 font-bold">نشط</span>' : '<span class="text-red-600 font-bold">موقوف</span>') + '</td><td class="p-3">' + act + '</td></tr>';
+      }).join(""));
+    }
+    function renderKyc() {
+      const body = document.getElementById("kyc-table-body");
+      const drivers = data.profiles.filter(u => u.role === "driver");
+      document.getElementById("kyc-count").textContent = data.kycs.filter(k => k.status === "pending").length + " بانتظار المراجعة";
+      const btn = (path, t) => '<button onclick="viewPrivate(\'kyc\',\'' + esc(path) + '\',\'' + t + '\')" class="text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50 font-bold ml-1">' + t + '</button>';
+      setHTML(body, drivers.length ? drivers.map((u, i) => {
+        const k = kycOf(u.id);
+        if (!k) return '<tr class="anim-fade" style="animation-delay:' + Math.min(i * 40, 400) + 'ms"><td class="p-3 font-semibold">' + esc(u.name) + '</td><td class="p-3" colspan="5"><span class="text-xs text-slate-400">لا توجد وثائق</span></td></tr>';
+        return '<tr class="anim-fade" style="animation-delay:' + Math.min(i * 40, 400) + 'ms"><td class="p-3 font-semibold">' + esc(u.name) + '<div class="text-xs text-slate-400 tabular-nums" dir="ltr">' + esc(u.login_id) + '</div></td>' +
+          '<td class="p-3">' + esc(k.from_place) + '</td><td class="p-3 font-bold">' + esc(k.plate) + '</td>' +
+          '<td class="p-3 whitespace-nowrap">' + btn(k.id_path, "البطاقة") + btn(k.face_path, "الوجه") + btn(k.car_path, "السيارة") + '</td>' +
+          '<td class="p-3">' + (KYC_LABEL[k.status] || "") + '</td><td class="p-3 whitespace-nowrap">' +
+          (k.status !== "approved" ? '<button onclick="reviewKyc(\'' + esc(u.id) + '\', true)" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white font-bold">اعتماد</button> ' : '') +
+          (k.status !== "rejected" ? '<button onclick="reviewKyc(\'' + esc(u.id) + '\', false)" class="text-xs px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100 font-bold">رفض</button>' : '') + '</td></tr>';
+      }).join("") : '<tr><td colspan="6" class="p-6 text-center text-slate-400">لا يوجد سائقون مسجلون بعد.</td></tr>');
+    }
+    const reviewKyc = (id, ok) => rpc("admin_review_kyc", { p_driver: id, p_ok: ok }, ok ? "تم اعتماد السائق" : "تم رفض وثائق السائق");
+    const toggleUser = (id, active) => rpc("admin_set_active", { p_user: id, p_active: active }, active ? "تم التفعيل" : "تم الإيقاف");
+    function showAdminMsg(t, ok) { const m = document.getElementById("aa-msg"); m.textContent = t; m.className = "text-xs font-bold " + (ok ? "text-emerald-600" : "text-red-600"); }
+    async function addAdmin(e) {
+      e.preventDefault();
+      const login = loginKey(document.getElementById("aa-user").value);
+      if (!login) { showAdminMsg("اكتب رقم جوال أو إيميل صحيح", false); return false; }
+      const { error } = await sb.rpc("admin_set_role", { p_login: login, p_role: "admin" });
+      if (error) showAdminMsg(errMsg(error), false);
+      else { showAdminMsg("تمت الترقية. المستخدم يحتاج يسجل خروج ويدخل من جديد.", true); document.getElementById("add-admin-form").reset(); await refreshAndRender(false); }
+      return false;
+    }
+
+    function renderAll() {
+      if (!me) return;
+      renderShipperList(); renderDriver(); renderAdmin(); hydrateGoodsImgs();
+    }
+
+    function openWaybill(id) {
+      const s = data.shipments.find(x => x.id === id); if (!s) return;
+      const row = (k, v) => '<div class="flex justify-between gap-4 border-b border-slate-100 pb-2"><span class="text-slate-500">' + k + '</span><strong class="text-left">' + v + '</strong></div>';
+      document.getElementById("waybill-content").innerHTML =
+        row("رقم البوليصة", esc(s.id)) + row("من", esc(originName(s))) +
+        (s.pickup_mode !== "preset" ? row("نوع الاستلام", s.pickup_mode === "map" ? "نقطة من الخريطة" : "موقع العميل الحالي") : "") +
+        row("إلى", esc(destName(s))) + row("المسافة", esc(s.distance) + " كم") + row("نوع الشاحنة", esc(truckLabel(s))) +
+        row("الوزن", esc(s.weight) + " طن") + row("البضاعة", esc(s.cargo)) + row("السائق", esc(driverLabel(s.driver_id))) +
+        row("طريقة الدفع", esc(s.payment)) + row("القيمة", fmt(s.price) + " ج.م") + row("الحالة", (STATUS_MAP[s.status] || {}).label || "");
+      document.getElementById("waybill-modal").classList.remove("hidden");
+    }
+    function closeWaybill() { document.getElementById("waybill-modal").classList.add("hidden"); }
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeWaybill(); });
+    document.getElementById("waybill-modal").addEventListener("click", e => { if (e.target.id === "waybill-modal") closeWaybill(); });
+
+    /* ---------- الدخول والتسجيل (Supabase Auth) ---------- */
+    function normPhone(v) {
+      const s = String(v).trim().replace(/[\s-]/g, "");
+      return /^(\+?20|0)?1[0125]\d{8}$/.test(s) ? "0" + s.slice(-10) : null;
+    }
+    // المفتاح اللي بيتخزن في login_id: إيميل بحروف صغيرة أو رقم جوال بصيغة 01xxxxxxxxx
+    function loginKey(v) {
+      const s = String(v).trim().toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return s;
+      return normPhone(s);
+    }
+    function authEmail(key) { return key.includes("@") ? key : key + "@" + PHONE_DOMAIN; }
+    function authError(msg) { const e = document.getElementById("auth-error"); e.textContent = msg || ""; e.classList.toggle("hidden", !msg); }
+    function authTab(t) {
+      authError("");
+      document.getElementById("login-form").classList.toggle("hidden", t !== "login");
+      document.getElementById("register-form").classList.toggle("hidden", t !== "register");
+      document.getElementById("tab-login").className = "flex-1 py-2 rounded-lg " + (t === "login" ? "bg-white shadow text-slate-900" : "text-slate-500");
+      document.getElementById("tab-register").className = "flex-1 py-2 rounded-lg " + (t === "register" ? "bg-white shadow text-slate-900" : "text-slate-500");
+    }
+    function toggleDriverFields() { document.getElementById("driver-fields").classList.toggle("hidden", document.getElementById("r-role").value !== "driver"); }
+    async function previewPhoto(inp, imgId, phId) {
+      const img = document.getElementById(imgId), ph = document.getElementById(phId);
+      if (!inp.files[0]) { img.classList.add("hidden"); ph.classList.remove("hidden"); return; }
+      try { img.src = (await readImage(inp.files[0], 400)).dataUrl; img.classList.remove("hidden"); ph.classList.add("hidden"); }
+      catch (e) { inp.value = ""; authError("الملف ليس صورة صالحة"); }
+    }
+    async function doLogin(e) {
+      e.preventDefault();
+      const lbtn = e.submitter; if (lbtn) { lbtn.disabled = true; lbtn.classList.add("is-loading"); }
+      try {
+      if (!sb) { authError("لم يتم ضبط Supabase بعد."); return false; }
+      const key = loginKey(document.getElementById("l-id").value), pw = document.getElementById("l-pass").value;
+      if (!key || !pw) { authError("بيانات الدخول غير صحيحة"); return false; }
+      const { error } = await sb.auth.signInWithPassword({ email: authEmail(key), password: pw });
+      if (error) { authError("بيانات الدخول غير صحيحة"); return false; }
+      await enterApp(); return false;
+      } finally { if (lbtn) { lbtn.disabled = false; lbtn.classList.remove("is-loading"); } }
+    }
+    async function doRegister(e) {
+      e.preventDefault();
+      if (!sb) { authError("لم يتم ضبط Supabase بعد."); return false; }
+      const name = document.getElementById("r-name").value.trim();
+      const key = loginKey(document.getElementById("r-phone").value);
+      const role = document.getElementById("r-role").value === "driver" ? "driver" : "shipper";
+      const pw = document.getElementById("r-pass").value;
+      if (name.length < 3) { authError("اكتب الاسم بالكامل"); return false; }
+      if (!key) { authError("رقم الجوال أو الإيميل غير صحيح"); return false; }
+      if (pw.length < 8) { authError("كلمة المرور يجب ألا تقل عن 8 أحرف"); return false; }
+      if (pw !== document.getElementById("r-pass2").value) { authError("كلمتا المرور غير متطابقتين"); return false; }
+      let from, plate, files;
+      if (role === "driver") {
+        from = document.getElementById("r-from").value.trim().slice(0, 60);
+        plate = document.getElementById("r-plate").value.trim().slice(0, 20);
+        files = ["r-idphoto", "r-facephoto", "r-carphoto"].map(i => document.getElementById(i).files[0]);
+        if (from.length < 2) { authError("اكتب بلد السائق / المحافظة"); return false; }
+        if (plate.length < 3) { authError("اكتب رقم لوحة السيارة"); return false; }
+        if (files.some(f => !f)) { authError("لازم ترفع صورة البطاقة وصورة وجهك وصورة العربية"); return false; }
+        if (!document.getElementById("r-consent").checked) { authError("لازم توافق على استخدام الصور للتحقق من الهوية"); return false; }
+      }
+      const btn = e.submitter; if (btn) { btn.disabled = true; btn.classList.add("is-loading"); }
+      try {
+        const imgs = role === "driver" ? await Promise.all(files.map(f => readImage(f, 1000))) : null;
+        const { data: su, error } = await sb.auth.signUp({ email: authEmail(key), password: pw,
+          options: { data: { name, role, login_id: key, phone: key.includes("@") ? null : key } } });
+        if (error) { authError(/registered|exists/i.test(error.message) ? "هذا الرقم/الإيميل مسجل بالفعل" : "تعذر إنشاء الحساب: " + error.message); return false; }
+        if (!su.session) { authError("تم إنشاء الحساب لكن لازم تعطّل تأكيد الإيميل في Supabase (راجع دليل النشر)."); return false; }
+        if (role === "driver") {
+          const uid = su.user.id, names = ["id", "face", "car"], paths = names.map(n => uid + "/" + n + ".jpg");
+          for (let i = 0; i < 3; i++) {
+            const up = await sb.storage.from("kyc").upload(paths[i], imgs[i].blob, { contentType: "image/jpeg", upsert: true });
+            if (up.error) throw up.error;
+          }
+          const ins = await sb.from("driver_kyc").insert({ driver_id: uid, from_place: from, plate, id_path: paths[0], face_path: paths[1], car_path: paths[2] });
+          if (ins.error) throw ins.error;
+        }
+        await enterApp();
+      } catch (err) { authError("تعذر إكمال التسجيل: " + errMsg(err)); }
+      finally { if (btn) { btn.disabled = false; btn.classList.remove("is-loading"); } }
+      return false;
+    }
+    async function enterApp() {
+      const { data: u } = await sb.auth.getUser();
+      if (!u || !u.user) return;
+      const { data: p, error } = await sb.from("profiles").select("*").eq("id", u.user.id).single();
+      if (error || !p) { await sb.auth.signOut(); authError("تعذر تحميل الحساب"); return; }
+      if (!p.active) { await sb.auth.signOut(); authError("هذا الحساب موقوف. تواصل مع الإدارة."); return; }
+      me = p; await loadData(); showApp(); startPolling();
+    }
+    function showApp() {
+      authError("");
+      const authScr = document.getElementById("auth-screen");
+      authScr.classList.add("auth-leave");
+      setTimeout(() => { authScr.classList.add("hidden"); authScr.classList.remove("auth-leave"); }, 280);
+      ["app-header", "app-main"].forEach(i => {
+        const x = document.getElementById(i);
+        x.classList.remove("hidden"); x.classList.remove("app-enter"); void x.offsetWidth; x.classList.add("app-enter");
+      });
+      document.getElementById("app-footer").classList.remove("hidden");
+      const isAdmin = me.role === "admin";
+      document.getElementById("role-switcher").classList.toggle("hidden", !isAdmin);
+      document.getElementById("user-chip").textContent = me.name + " · " + ROLE_LABEL[me.role];
+      if (!mapReady) { mapReady = true; if (typeof L !== "undefined") initMap(); else document.getElementById("map").innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400">تعذر تحميل الخريطة. تحقق من الاتصال بالإنترنت.</div>'; }
+      switchRole(isAdmin ? "admin" : me.role);
+    }
+    async function logout() {
+      clearInterval(pollTimer);
+      if (sb) await sb.auth.signOut();
+      me = null; data = { shipments: [], profiles: [], kycs: [], secrets: {} };
+      ["app-header", "app-main", "app-footer"].forEach(i => document.getElementById(i).classList.add("hidden"));
+      const authScr2 = document.getElementById("auth-screen");
+      authScr2.classList.remove("hidden"); authScr2.classList.remove("auth-enter"); void authScr2.offsetWidth; authScr2.classList.add("auth-enter");
+      document.getElementById("login-form").reset(); authTab("login");
+    }
+
+    async function init() {
+      authTab("login");
+      setPickupMode("preset");
+      if (!sb) { document.getElementById("cfg-warn").classList.remove("hidden"); return; }
+      const { data: s } = await sb.auth.getSession();
+      if (s && s.session) await enterApp();
+    }
+    
+    function calcDistanceKm(c1, c2) {
+      const R = 6371;
+      const dLat = (c2[0] - c1[0]) * Math.PI / 180;
+      const dLon = (c2[1] - c1[1]) * Math.PI / 180;
+      const a = Math.sin(dLat/2)**2 + Math.cos(c1[0]*Math.PI/180) * Math.cos(c2[0]*Math.PI/180) * Math.sin(dLon/2)**2;
+      return Math.max(15, Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.25));
+    }
+
+    function updateMapAndPrice() {
+      const oKey = pickup.mode === "preset" ? document.getElementById("origin").value : "custom";
+      const dKey = document.getElementById("destination").value;
+      const tKey = document.getElementById("truckType").value;
+      const weight = Math.min(30, Math.max(0.5, parseFloat(document.getElementById("weight").value) || 1));
+      const isBackhaul = document.getElementById("backhaul").checked;
+
+      const oLoc = oKey === "custom" ? (pickup.coords ? { name: pickup.label, coords: pickup.coords } : null) : LOCATIONS[oKey];
+      const dLoc = LOCATIONS[dKey];
+      if (!oLoc) {
+        document.getElementById("calc-dist").innerText = "—";
+        document.getElementById("calc-time").innerText = "—";
+        document.getElementById("calc-price").innerText = "—";
+        if (map) {
+          [originMarker, destMarker, routeLine].forEach(l => l && map.removeLayer(l));
+          originMarker = routeLine = null;
+          destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + dLoc.name);
+        }
+        return null;
+      }
+      const dist = calcDistanceKm(oLoc.coords, dLoc.coords);
+      const mins = Math.round((dist / 65) * 60) + 20;
+
+      const rate = TRUCK_RATES[tKey];
+      let price = rate.base + (dist * rate.perKm) + (weight * 45);
+      if (isBackhaul) price = price * 0.85;
+      price = Math.round(price / 10) * 10;
+
+      document.getElementById("calc-dist").innerText = dist + " كم";
+      document.getElementById("calc-time").innerText = Math.floor(mins/60) + " س " + (mins%60) + " د";
+      document.getElementById("calc-price").innerText = price.toLocaleString("en-US");
+      const priceWrap = document.getElementById("calc-price").parentElement;
+      if (priceWrap) { priceWrap.classList.remove("price-flash"); void priceWrap.offsetWidth; priceWrap.classList.add("price-flash"); }
+
+      if (map) {
+        if (originMarker) map.removeLayer(originMarker);
+        if (destMarker) map.removeLayer(destMarker);
+        if (routeLine) map.removeLayer(routeLine);
+
+        originMarker = L.marker(oLoc.coords).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
+        destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + dLoc.name);
+        routeLine = L.polyline([oLoc.coords, dLoc.coords], { color: '#f97316', weight: 4, dashArray: '8, 8' }).addTo(map);
+        map.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+      }
+      return { dist, price };
+    }
+
+
+    /* ---------- Pickup location ---------- */
+    let pickup = { mode: "preset", coords: null, label: "" };
+    function fmtCoords(c) { return Number(c[0]).toFixed(4) + ", " + Number(c[1]).toFixed(4); }
+    function setPickupHint(text, cls) {
+      const el = document.getElementById("pickup-hint");
+      el.textContent = text || ""; el.className = (text ? "" : "hidden ") + "mt-2 text-xs rounded-lg px-3 py-2 " + (cls || "");
+    }
+    function setPickupMode(m) {
+      pickup.mode = m;
+      document.querySelectorAll(".pm-btn").forEach(b => {
+        const on = b.dataset.mode === m;
+        b.className = "pm-btn py-2 rounded-xl border " + (on ? "bg-orange-500 text-white border-orange-500" : "bg-white text-slate-600 border-slate-300");
+      });
+      document.getElementById("origin").classList.toggle("hidden", m !== "preset");
+      if (m === "preset") { pickup.coords = null; setPickupHint(""); }
+      else if (m === "current") { pickup.coords = null; pickup.label = ""; locateMe(); }
+      else {
+        if (!pickup.coords || pickup.src !== "map") { pickup.coords = null; pickup.label = ""; }
+        setPickupHint(pickup.coords ? "تم تحديد الموقع: " + fmtCoords(pickup.coords) : "اضغط على الخريطة لوضع دبوس مكان الاستلام. السائق سيرسل لك صورة البضاعة لتأكيدها.", "bg-purple-50 text-purple-800");
+      }
+      updateMapAndPrice();
+      renderOriginLabel();
+    }
+    function renderOriginLabel() {
+      let el = document.getElementById("origin-custom");
+      if (!el) {
+        el = document.createElement("div"); el.id = "origin-custom";
+        el.className = "w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold text-slate-700";
+        document.getElementById("origin").after(el);
+      }
+      el.classList.toggle("hidden", pickup.mode === "preset");
+      el.textContent = pickup.coords ? pickup.label : (pickup.mode === "map" ? "اضغط على الخريطة" : "جاري تحديد الموقع...");
+    }
+    function locateMe() {
+      if (!navigator.geolocation) return setPickupHint("المتصفح لا يدعم تحديد الموقع. اختر من الخريطة.", "bg-red-50 text-red-700");
+      setPickupHint("جاري تحديد موقعك...", "bg-sky-50 text-sky-800");
+      navigator.geolocation.getCurrentPosition(pos => {
+        if (pickup.mode !== "current") return;
+        pickup.coords = [pos.coords.latitude, pos.coords.longitude]; pickup.src = "gps";
+        pickup.label = "موقعي الحالي (" + fmtCoords(pickup.coords) + ")";
+        setPickupHint("تم تحديد موقعك الحالي.", "bg-sky-50 text-sky-800");
+        updateMapAndPrice(); renderOriginLabel();
+      }, () => {
+        if (pickup.mode !== "current") return;
+        setPickupHint("تعذر تحديد موقعك (تأكد من إذن الموقع). يمكنك اختيار نقطة من الخريطة.", "bg-red-50 text-red-700");
+        renderOriginLabel();
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+    function onMapClick(e) {
+      if (pickup.mode !== "map") return;
+      pickup.coords = [e.latlng.lat, e.latlng.lng]; pickup.src = "map";
+      pickup.label = "نقطة على الخريطة (" + fmtCoords(pickup.coords) + ")";
+      setPickupHint("تم تحديد الموقع: " + fmtCoords(pickup.coords), "bg-purple-50 text-purple-800");
+      updateMapAndPrice(); renderOriginLabel();
+    }
+
+
+    init();
+  </script>
+</body>
+</html>
