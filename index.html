@@ -15,11 +15,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Noto+Kufi+Arabic:wght@600;700;800&amp;display=swap" rel="stylesheet">
   <style>
     :root { --ease-out: cubic-bezier(.22,.9,.3,1); }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+    body { font-family: 'IBM Plex Sans Arabic','Cairo',sans-serif; background-color: #f8fafc; }
     /* ===== Hayo themes: light = Nile Dusk, dark = Neon Emerald. غيّر الألوان من هنا فقط ===== */
     :root, html[data-theme="light"] {
       --bg-1:#FFF3E4; --bg-2:#FBE3D4; --glow-1:#F5B25C; --glow-2:#E2693A; --glow-a1:.47; --glow-a2:.35;
@@ -80,7 +80,8 @@
     html[data-theme] #app-header .border-slate-700 { border-color:var(--line); }
     html[data-theme] #app-header #user-chip { background:color-mix(in srgb,var(--success) 15%,transparent); color:var(--success); border-color:var(--line); }
     html[data-theme] #app-header .bg-orange-500 { color:var(--on-accent); }
-    html[data-theme="dark"] .leaflet-tile { filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.7); }
+    html[data-theme="light"] .hy-tile { filter:saturate(.45) sepia(.18) contrast(.95) brightness(1.04); }
+    html[data-theme="dark"] .hy-tile { filter:invert(1) hue-rotate(155deg) saturate(.3) brightness(.72) contrast(.9); }
     html[data-theme="dark"] .leaflet-container { background:#0b1a13; }
     /* مفتاح الوضع */
     .hy-toggle { width:2.4rem; height:2.4rem; border-radius:.8rem; border:1px solid var(--line); background:var(--field); color:var(--text); display:inline-flex; align-items:center; justify-content:center; }
@@ -128,10 +129,73 @@
     .gps-ok { background:color-mix(in srgb,var(--success) 18%,transparent); color:var(--success); border:1px solid var(--line); }
     .gps-bad { background:color-mix(in srgb,var(--danger) 18%,transparent); color:var(--danger); border:1px solid var(--line); }
     html[data-theme] .bg-purple-100 { background:color-mix(in srgb,var(--accent-1) 22%,transparent); }
+    html[data-theme] .hover\:bg-slate-50:hover, html[data-theme] .hover\:bg-slate-200:hover { background:var(--field); }
+    html[data-theme] .hover\:bg-slate-700:hover { background:var(--field); }
+    html[data-theme] .hover\:bg-red-100:hover { background:color-mix(in srgb,var(--danger) 22%,transparent); }
+    html[data-theme] thead, html[data-theme] .bg-slate-50 { background:var(--field); }
+    html[data-theme] table { color:var(--text); } html[data-theme] tbody tr { border-color:var(--line); }
+    html[data-theme] .bg-emerald-100 { background:color-mix(in srgb,var(--success) 22%,transparent); color:var(--text); }
+    html[data-theme] .bg-amber-100 { background:color-mix(in srgb,var(--warning) 22%,transparent); color:var(--text); }
+    html[data-theme] .bg-red-100 { background:color-mix(in srgb,var(--danger) 22%,transparent); color:var(--text); }
+    html[data-theme] .bg-blue-100, html[data-theme] .bg-sky-100 { background:color-mix(in srgb,#3B82F6 22%,transparent); color:var(--text); }
+    html[data-theme] .bg-orange-100 { background:color-mix(in srgb,var(--accent-1) 22%,transparent); color:var(--text); }
+    html[data-theme] .text-blue-800, html[data-theme] .text-emerald-800, html[data-theme] .text-amber-800, html[data-theme] .text-red-800 { color:var(--text); }
+    html[data-theme] .bg-slate-600 { background:var(--field); color:var(--text); border:1px solid var(--line); }
+    html[data-theme] .bg-red-600, html[data-theme] .bg-red-500 { background:var(--danger); color:#fff; }
+    html[data-theme] .bg-slate-200 { background:var(--field); }
+    @media print {
+      html[data-theme] body { background:#fff !important; color:#000 !important; } html[data-theme] body::before, html[data-theme] body::after { display:none; }
+      html[data-theme] #waybill-modal, html[data-theme] #waybill-modal * { color:#000 !important; background:#fff !important; box-shadow:none !important; backdrop-filter:none !important; border-color:#999 !important; }
+    }
+    /* ---------- typography v3 ---------- */
+    html[data-theme] body { font-size:15px; line-height:1.7; letter-spacing:0; font-weight:400; }
+    html[data-theme] h1, html[data-theme] h2, html[data-theme] h3, html[data-theme] h4, html[data-theme] .font-extrabold, html[data-theme] .font-black { font-family:'Noto Kufi Arabic','IBM Plex Sans Arabic',sans-serif; line-height:1.5; }
+    html[data-theme] .font-bold { font-weight:600; } html[data-theme] .font-semibold { font-weight:500; }
+    html[data-theme] .text-xs { font-size:.78rem; line-height:1.7; }
+    html[data-theme] .text-sm { font-size:.875rem; line-height:1.75; }
+    html[data-theme] button, html[data-theme] input, html[data-theme] select, html[data-theme] textarea { font-family:inherit; font-size:.9rem; }
+    html[data-theme] .text-2xl { font-size:1.3rem; } html[data-theme] .text-3xl { font-size:1.5rem; } html[data-theme] .text-4xl { font-size:1.75rem; } html[data-theme] .text-xl { font-size:1.1rem; } html[data-theme] .text-lg { font-size:1rem; }
+    html[data-theme] button.py-3, html[data-theme] button.py-2\.5 { padding-top:.6rem; padding-bottom:.6rem; }
+    html[data-theme] table { font-size:.875rem; border-collapse:separate; border-spacing:0; }
+    html[data-theme] th.p-3 { padding:.9rem 1rem; font-weight:600; white-space:nowrap; }
+    html[data-theme] td.p-3 { padding:1.1rem 1rem; line-height:1.8; vertical-align:top; }
+    html[data-theme] tbody tr > td { border-bottom:1px solid var(--line); }
+    html[data-theme] td .mt-1 { margin-top:.45rem; }
+    html[data-theme] .space-y-2 > * + * { margin-top:.7rem; } html[data-theme] .space-y-3 > * + * { margin-top:1rem; }
+    html[data-theme] .gap-2 { gap:.6rem; } html[data-theme] .gap-3 { gap:.9rem; }
+    html[data-theme] .p-4 { padding:1rem; } html[data-theme] .p-5 { padding:1.15rem; }
+    html[data-theme] [id$="-list"] > * + * { margin-top:.9rem; }
+    html[data-theme] .rounded-full.px-2, html[data-theme] .rounded-full[class*="px-"] { padding:.25rem .75rem; font-size:.8125rem; font-weight:500; white-space:nowrap; }
+    html[data-theme] .text-slate-400, html[data-theme] .text-slate-500 { font-size:inherit; }
+    @media (max-width:640px) {
+      html[data-theme] .grid.grid-cols-2.gap-3 { grid-template-columns:1fr; gap:1.1rem; }
+      html[data-theme] select, html[data-theme] input:not([type=checkbox]):not([type=radio]), html[data-theme] textarea { min-height:2.8rem; padding:.55rem .85rem; width:100%; text-overflow:ellipsis; }
+      html[data-theme] label, html[data-theme] .block.text-sm, html[data-theme] .block.text-xs { display:block; margin-bottom:.45rem; font-size:.85rem; font-weight:500; line-height:1.6; color:var(--text-muted); }
+      html[data-theme] select { white-space:normal; }
+      html[data-theme] .text-\[11px\] { font-size:.875rem; }
+      html[data-theme] #dest-modes, html[data-theme] #pickup-modes { gap:.5rem; }
+      html[data-theme] .overflow-x-auto table, html[data-theme] .overflow-x-auto tbody, html[data-theme] .overflow-x-auto tr, html[data-theme] .overflow-x-auto td { display:block; width:100%; }
+      html[data-theme] .overflow-x-auto thead { display:none; }
+      html[data-theme] .overflow-x-auto tbody tr { padding:.9rem 1rem; margin:.8rem; width:auto; border:1px solid var(--line); border-radius:1rem; background:var(--field); }
+      html[data-theme] .overflow-x-auto td.p-3 { padding:.55rem 0; display:block; border-bottom:1px dashed var(--line); text-align:right; }
+      html[data-theme] .overflow-x-auto td.p-3:last-child { border-bottom:0; }
+      html[data-theme] .overflow-x-auto td.p-3::before { content:attr(data-label); display:block; margin-bottom:.15rem; font-size:.8125rem; color:var(--text-muted); font-weight:500; }
+      html[data-theme] .overflow-x-auto td[colspan]::before { display:none; }
+      
+    }
+    html[data-theme] .hy-chip { background:color-mix(in srgb,var(--accent-1) 20%,transparent) !important; color:var(--accent-text) !important; border:1px solid color-mix(in srgb,var(--accent-1) 40%,transparent); }
+    html[data-theme="dark"] .rounded-full[class*="bg-"][class*="-100"], html[data-theme="dark"] [class*="bg-"][class*="-100"][class*="text-"], html[data-theme="dark"] [class*="bg-"][class*="-50"][class*="text-"] { color:var(--text) !important; }
+    html[data-theme="light"] .rounded-full[class*="bg-"][class*="-100"] { color:#12355B !important; }
+    .leaflet-bar { border:0 !important; box-shadow:var(--shadow) !important; border-radius:.8rem !important; overflow:hidden; }
+    .leaflet-bar a { background:var(--surface-solid) !important; color:var(--text) !important; border-bottom:1px solid var(--line) !important; width:32px !important; height:32px !important; line-height:32px !important; }
+    .leaflet-control-attribution { background:color-mix(in srgb,var(--surface-solid) 80%,transparent) !important; color:var(--text-muted) !important; font-size:9px !important; border-radius:.5rem 0 0 0; } .leaflet-control-attribution a { color:var(--text-muted) !important; }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip { background:var(--surface-solid); color:var(--text); border-radius:.8rem; font-family:inherit; }
+    .hy-pin { border:2px solid #fff !important; }
+    @media (max-width:640px) { html[data-theme] .overflow-x-auto td.p-3:not([data-label="المسار"]) { display:flex; justify-content:space-between; align-items:center; gap:.8rem; } html[data-theme] .overflow-x-auto td.p-3:not([data-label="المسار"])::before { margin:0; flex:0 0 auto; } }
     .hy-grad-text { background:var(--accent-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
     .tabular-nums { font-variant-numeric: tabular-nums; }
-    #map { height: 320px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+    #map { height: 300px; width: 100%; border-radius: 1.1rem; z-index: 1; border:1px solid var(--line); overflow:hidden; }
     @media print { .no-print { display: none !important; } }
 
     /* ---------- الحركة والانتقالات ---------- */
@@ -263,7 +327,7 @@
         <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
           <div class="flex items-center justify-between border-b pb-3">
             <h2 class="font-extrabold text-lg text-slate-800">طلب شحنة جديدة</h2>
-            <span class="text-xs bg-orange-100 text-orange-700 font-bold px-2.5 py-1 rounded-full">تسعير ديناميكي فوري</span>
+            <span class="hy-chip text-xs font-bold px-2.5 py-1 rounded-full">تسعير ديناميكي فوري</span>
           </div>
 
           <div>
@@ -460,7 +524,7 @@
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-bold text-slate-800 text-sm">خريطة المسار</h3>
-              <span class="text-xs text-emerald-600 font-bold flex items-center gap-1">خريطة المسار</span>
+              <span class="text-xs" style="color:var(--text-muted)">المسار التقريبي بين نقطتي الرحلة</span>
             </div>
             <div id="map"></div>
           </div>
@@ -802,10 +866,14 @@
       toastTimer = setTimeout(() => { el.style.display = "none"; }, 4000);
     }
     function errMsg(e) { return (e && e.message) ? e.message : "حصل خطأ. جرّب مرة أخرى."; }
+    const HY_MAPS = [];
+    function hyAddTiles(m) { L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19, className: 'hy-tile' }).addTo(m); }
     let map, routeLine, originMarker, destMarker;
     function initMap() {
-      map = L.map('map').setView([30.2, 31.3], 8);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      map = L.map('map', { zoomControl: false, attributionControl: true }).setView([30.2, 31.3], 8);
+      L.control.zoom({ position: 'bottomleft' }).addTo(map);
+      map.attributionControl.setPrefix(false);
+      hyAddTiles(map);
       map.on("click", onMapClick);
       setPickupMode(pickup.mode);
       setDestMode(dest.mode);
@@ -1013,8 +1081,26 @@
     }
 
     function statusBadge(st) { const m = STATUS_MAP[st] || STATUS_MAP.requested; return '<span class="badge-anim text-xs font-bold px-2.5 py-1 rounded-full ' + m.color + '">' + m.label + '</span>'; }
-    function originName(s) { return s.origin_key === "custom" ? (s.origin_label || "موقع محدد") : (LOCATIONS[s.origin_key] || {}).name || ""; }
-    function destName(s) { return s.dest_key === "custom" ? (s.dest_label || "موقع محدد") : (LOCATIONS[s.dest_key] || {}).name || ""; }
+    const COORD_RE = /\s*\(?\s*-?\d+\.\d+\s*[,،]\s*-?\d+\.\d+\s*\)?/;
+    function nearestLocName(lat, lng) {
+      let best = null, bd = 1e9; const t = x => x * Math.PI / 180;
+      Object.values(LOCATIONS).forEach(l => { const d = Math.hypot(t(l.coords[0] - lat), t(l.coords[1] - lng) * Math.cos(t(lat))); if (d < bd) { bd = d; best = l; } });
+      return best ? best.name.replace(/\s*\(.*?\)\s*/g, " ").trim() : "";
+    }
+    function customName(label, lat, lng, kind) {
+      let l = (label || "").replace(COORD_RE, "").replace(/\s*[:،-]\s*$/, "").trim();
+      const generic = !l || /^نقطة( (تسليم|تحميل))?( على الخريطة)?$/.test(l) || l === "موقع محدد";
+      if (!generic) return l;
+      const near = (lat != null && lng != null) ? nearestLocName(Number(lat), Number(lng)) : "";
+      return (kind === "dest" ? "نقطة تسليم" : "نقطة تحميل") + (near ? " قرب " + near : " على الخريطة");
+    }
+    function originName(s) { return s.origin_key === "custom" ? customName(s.origin_label, s.origin_lat, s.origin_lng, "origin") : (LOCATIONS[s.origin_key] || {}).name || ""; }
+    function destName(s) { return s.dest_key === "custom" ? customName(s.dest_label, s.dest_lat, s.dest_lng, "dest") : (LOCATIONS[s.dest_key] || {}).name || ""; }
+    function mapLinks(s) {
+      const e = endpointsOf(s), a = (p, t) => p ? '<a href="https://www.google.com/maps?q=' + p[0] + ',' + p[1] + '" target="_blank" rel="noopener" class="underline text-xs" style="color:var(--accent-text)">' + t + '</a>' : "";
+      const out = [a(e.o, "التحميل على الخريطة"), a(e.d, "التسليم على الخريطة")].filter(Boolean).join(" · ");
+      return out ? '<div class="mt-1">' + out + '</div>' : "";
+    }
     function truckLabel(s) { return (TRUCK_RATES[s.truck_key] || {}).label || ""; }
     function mapsLink(s) {
       let out = "";
@@ -1139,7 +1225,7 @@
       const rows = all.filter(s => !q || (s.id + " " + originName(s) + " " + destName(s)).toLowerCase().includes(q));
       setHTML(document.getElementById("admin-table-body"), rows.length ? rows.map((s, i) =>
         '<tr class="anim-fade hover:bg-slate-50 transition-colors" style="animation-delay:' + Math.min(i * 40, 400) + 'ms"><td class="p-3 font-bold tabular-nums"><button onclick="openWaybill(\'' + esc(s.id) + '\')" class="underline decoration-dotted">' + esc(s.id) + '</button></td>' +
-        '<td class="p-3">' + routeText(s) + (s.pickup_mode !== "preset" ? '<div class="mt-1">' + pickupBadge(s) + '</div>' : '') + '</td>' +
+        '<td class="p-3" style="min-width:12rem">' + routeText(s) + (s.pickup_mode !== "preset" ? '<div class="mt-1">' + pickupBadge(s) + '</div>' : '') + mapLinks(s) + '</td>' +
         '<td class="p-3">' + esc(truckLabel(s)) + ' / ' + esc(s.weight) + ' طن</td>' +
         '<td class="p-3 tabular-nums font-semibold">' + fmt(s.price) + ' ج.م</td>' +
         '<td class="p-3">' + statusBadge(s.status) + (s.rating ? ' <span class="text-amber-500 text-xs">' + stars(s.rating) + '</span>' : '') + '</td></tr>').join("")
@@ -1203,7 +1289,7 @@
         (s.pickup_mode !== "preset" ? row("نوع الاستلام", s.pickup_mode === "map" ? "نقطة من الخريطة" : "موقع العميل الحالي") : "") +
         row("إلى", esc(destName(s))) + row("المسافة", esc(s.distance) + " كم") + row("نوع الشاحنة", esc(truckLabel(s))) +
         row("الوزن", esc(s.weight) + " طن") + row("البضاعة", esc(s.cargo)) + row("السائق", esc(driverLabel(s.driver_id))) +
-        row("طريقة الدفع", esc(s.payment)) + row("القيمة", fmt(s.price) + " ج.م") + row("الحالة", (STATUS_MAP[s.status] || {}).label || "");
+        row("على الخريطة", mapLinks(s).replace("mt-1","")) + row("طريقة الدفع", esc(s.payment)) + row("القيمة", fmt(s.price) + " ج.م") + row("الحالة", (STATUS_MAP[s.status] || {}).label || "");
       document.getElementById("waybill-modal").classList.remove("hidden");
     }
     function closeWaybill() { document.getElementById("waybill-modal").classList.add("hidden"); }
@@ -1462,7 +1548,7 @@
       document.getElementById("track-chat-btn").onclick = () => { closeTrack(); openChat(id); };
       if (!trk.map) {
         trk.map = L.map("track-map", { zoomControl: true }).setView([30.5, 31.2], 8);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(trk.map);
+        hyAddTiles(trk.map);
       }
       setTimeout(() => { trk.map.invalidateSize(); refreshTrack(true); }, 80);
       clearInterval(trk.timer); trk.timer = setInterval(() => refreshTrack(false), 5000);
@@ -1580,8 +1666,8 @@
         if (map) {
           [originMarker, destMarker, routeLine].forEach(l => l && map.removeLayer(l));
           originMarker = destMarker = routeLine = null;
-          if (oLoc) originMarker = L.marker(oLoc.coords).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
-          if (dLoc) destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
+          if (oLoc) originMarker = L.marker(oLoc.coords, { icon: pinIcon("A", "#16A34A") }).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
+          if (dLoc) destMarker = L.marker(dLoc.coords, { icon: pinIcon("B", "#DC2626") }).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
         }
         return null;
       }
@@ -1604,9 +1690,9 @@
         if (destMarker) map.removeLayer(destMarker);
         if (routeLine) map.removeLayer(routeLine);
 
-        originMarker = L.marker(oLoc.coords).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
-        destMarker = L.marker(dLoc.coords).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
-        routeLine = L.polyline([oLoc.coords, dLoc.coords], { color: '#f97316', weight: 4, dashArray: '8, 8' }).addTo(map);
+        originMarker = L.marker(oLoc.coords, { icon: pinIcon("A", "#16A34A") }).addTo(map).bindPopup("التحميل: " + esc(oLoc.name));
+        destMarker = L.marker(dLoc.coords, { icon: pinIcon("B", "#DC2626") }).addTo(map).bindPopup("التسليم: " + esc(dLoc.name));
+        routeLine = L.polyline([oLoc.coords, dLoc.coords], { color: cssVar('--accent-1') || '#E2693A', weight: 4, opacity: .95, dashArray: '2 9', lineCap: 'round' }).addTo(map);
         map.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
       }
       return { dist, price };
@@ -1691,6 +1777,19 @@
       }
       updateMapAndPrice();
     }
+    async function geoLabel(c, kind) {
+      try {
+        const ctl = new AbortController(); setTimeout(() => ctl.abort(), 6000);
+        const j = await (await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&accept-language=ar&lat=" + c[0] + "&lon=" + c[1], { signal: ctl.signal })).json();
+        const a = j.address || {}; const parts = [a.suburb || a.neighbourhood || a.village || a.town || a.city_district, a.city || a.town || a.county || a.state].filter(Boolean);
+        const uniq = parts.filter((x, i) => parts.indexOf(x) === i).join("، "); if (!uniq) return;
+        const tgt = kind === "dest" ? dest : pickup;
+        if (tgt.coords && tgt.coords[0] === c[0] && tgt.coords[1] === c[1]) {
+          tgt.label = (kind === "dest" ? "نقطة تسليم: " : "نقطة تحميل: ") + uniq;
+          if (kind === "dest") { const el = document.getElementById("dest-custom"); if (el) el.textContent = tgt.label; } else renderOriginLabel();
+        }
+      } catch (e) {}
+    }
     function onMapClick(e) {
       const pickWantsMap = pickup.mode === "map", destWantsMap = dest.mode === "map";
       if (!pickWantsMap && !destWantsMap) return;
@@ -1699,14 +1798,14 @@
       if (target === "dest" && !destWantsMap) target = "origin";
       const c = [e.latlng.lat, e.latlng.lng];
       if (target === "dest") {
-        dest.coords = c; dest.label = "نقطة تسليم على الخريطة (" + fmtCoords(c) + ")";
-        setDestHint("تم تحديد موقع التسليم: " + fmtCoords(c), "bg-purple-50 text-purple-800");
+        dest.coords = c; dest.label = customName("", c[0], c[1], "dest"); geoLabel(c, "dest");
+        setDestHint("تم تحديد موقع التسليم على الخريطة.", "bg-purple-50 text-purple-800");
         const el = document.getElementById("dest-custom"); if (el) el.textContent = dest.label;
         if (pickWantsMap && !pickup.coords) mapTarget = "origin";
       } else {
         pickup.coords = c; pickup.src = "map";
-        pickup.label = "نقطة على الخريطة (" + fmtCoords(c) + ")";
-        setPickupHint("تم تحديد الموقع: " + fmtCoords(c), "bg-purple-50 text-purple-800");
+        pickup.label = customName("", c[0], c[1], "origin"); geoLabel(c, "origin");
+        setPickupHint("تم تحديد موقع التحميل على الخريطة.", "bg-purple-50 text-purple-800");
         if (destWantsMap && !dest.coords) mapTarget = "dest";
       }
       updateMapAndPrice(); renderOriginLabel();
@@ -1715,5 +1814,10 @@
 
     init();
   </script>
+<script>
+(function(){function lab(t){var h=t.querySelectorAll('thead th');if(!h.length)return;var n=[].map.call(h,function(x){return x.textContent.trim()});t.querySelectorAll('tbody tr').forEach(function(r){[].forEach.call(r.children,function(c,i){if(c.tagName==='TD'&&!c.hasAttribute('data-label')&&n[i])c.setAttribute('data-label',n[i])})})}
+function all(){document.querySelectorAll('table').forEach(lab)}
+new MutationObserver(all).observe(document.documentElement,{childList:true,subtree:true});all();})();
+</script>
 </body>
 </html>
