@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="description" content="هايو: منصة نقل البضائع والأساطيل عند الطلب في مصر، تسعير فوري وتتبع وتسليم برمز OTP." />
-  <link rel="icon" href="assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <script>(function(){var t=null;try{t=localStorage.getItem("hy-theme")}catch(e){}if(t!=="light"&&t!=="dark"){t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"}document.documentElement.setAttribute("data-theme",t)})();</script>
+  <link rel="icon" href="assets/light/favicon.ico" sizes="any" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="assets/dark/favicon.ico" sizes="any" media="(prefers-color-scheme: dark)" />
+  <link rel="apple-touch-icon" href="assets/light/apple-touch-icon.png" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>هايو (Hayo) | منصة النقل واللوجستيات الذكية عند الطلب</title>
@@ -19,6 +20,116 @@
     :root { --ease-out: cubic-bezier(.22,.9,.3,1); }
     html { scroll-behavior: smooth; }
     body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+    /* ===== Hayo themes: light = Nile Dusk, dark = Neon Emerald. غيّر الألوان من هنا فقط ===== */
+    :root, html[data-theme="light"] {
+      --bg-1:#FFF3E4; --bg-2:#FBE3D4; --glow-1:#F5B25C; --glow-2:#E2693A; --glow-a1:.47; --glow-a2:.35;
+      --surface:rgba(255,255,255,.75); --surface-solid:#fffaf4; --surface-border:rgba(255,255,255,.94); --shadow:0 14px 40px rgba(42,63,122,.15);
+      --text:#12355B; --text-muted:#6B7F96; --text-nav:#35507F; --line:rgba(18,53,91,.16); --field:rgba(255,255,255,.85);
+      --accent-1:#E2693A; --accent-2:#F5B25C; --accent-text:#C2512A; --accent-gradient:linear-gradient(110deg,#E2693A 0%,#F5B25C 100%);
+      --on-accent:#FFFFFF; --btn-glow:0 10px 28px rgba(226,105,58,.43);
+      --success:#16A34A; --warning:#B45309; --danger:#DC2626; --tint-a:.12;
+    }
+    html[data-theme="dark"] {
+      --bg-1:#06130E; --bg-2:#06130E; --glow-1:#059669; --glow-2:#65A30D; --glow-a1:.59; --glow-a2:.43;
+      --surface:rgba(255,255,255,.063); --surface-solid:#0d2118; --surface-border:rgba(255,255,255,.15); --shadow:0 14px 40px rgba(0,0,0,.38);
+      --text:#F0FFF6; --text-muted:#8FB3A2; --text-nav:#BFE3D0; --line:rgba(255,255,255,.18); --field:rgba(255,255,255,.07);
+      --accent-1:#10B981; --accent-2:#BEF264; --accent-text:#BEF264; --accent-gradient:linear-gradient(110deg,#10B981 0%,#BEF264 100%);
+      --on-accent:#04210F; --btn-glow:0 10px 28px rgba(16,185,129,.43);
+      --success:#34D399; --warning:#FBBF24; --danger:#F87171; --tint-a:.16;
+    }
+    html { color-scheme: light; } html[data-theme="dark"] { color-scheme: dark; }
+    html[data-theme] body { background: linear-gradient(180deg,var(--bg-1),var(--bg-2)) fixed; color: var(--text); min-height:100vh; position:relative; }
+    html[data-theme] body::before, html[data-theme] body::after { content:""; position:fixed; z-index:-1; border-radius:50%; filter:blur(110px); pointer-events:none; }
+    html[data-theme] body::before { width:60vmax; height:60vmax; top:-20vmax; left:-15vmax; background:var(--glow-1); opacity:var(--glow-a1); }
+    html[data-theme] body::after { width:55vmax; height:55vmax; bottom:-20vmax; right:-15vmax; background:var(--glow-2); opacity:var(--glow-a2); }
+    .hy-light-only { display:inline-block; } .hy-dark-only { display:none; }
+    html[data-theme="dark"] .hy-light-only { display:none; } html[data-theme="dark"] .hy-dark-only { display:inline-block; }
+    /* ألواح زجاجية */
+    html[data-theme] .bg-white, html[data-theme] .hy-card { background:var(--surface); border-color:var(--surface-border); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:var(--shadow); }
+    html[data-theme] .bg-slate-50, html[data-theme] .bg-slate-100 { background:var(--field); }
+    html[data-theme] input, html[data-theme] select, html[data-theme] textarea { background-color:var(--field); color:var(--text); }
+    html[data-theme] input::placeholder, html[data-theme] textarea::placeholder { color:var(--text-muted); opacity:.8; }
+    html[data-theme] option { background:var(--surface-solid); color:var(--text); }
+    /* نصوص */
+    html[data-theme] .text-slate-900, html[data-theme] .text-slate-950, html[data-theme] .text-slate-800, html[data-theme] .text-slate-700 { color:var(--text); }
+    html[data-theme] .text-slate-600, html[data-theme] .text-slate-500, html[data-theme] .text-slate-400, html[data-theme] .text-slate-300 { color:var(--text-muted); }
+    html[data-theme] .text-orange-600, html[data-theme] .text-orange-700, html[data-theme] .text-orange-400, html[data-theme] .text-blue-600 { color:var(--accent-text); }
+    html[data-theme] .text-emerald-600, html[data-theme] .text-emerald-700, html[data-theme] .text-emerald-800, html[data-theme] .text-emerald-300, html[data-theme] .text-emerald-400 { color:var(--success); }
+    html[data-theme] .text-red-600, html[data-theme] .text-red-700 { color:var(--danger); }
+    html[data-theme] .text-amber-500, html[data-theme] .text-amber-600, html[data-theme] .text-amber-700, html[data-theme] .text-amber-800 { color:var(--warning); }
+    html[data-theme] .text-purple-800, html[data-theme] .text-sky-800 { color:var(--text); }
+    /* حدود */
+    html[data-theme] .border-slate-100, html[data-theme] .border-slate-200, html[data-theme] .border-slate-300 { border-color:var(--line); }
+    html[data-theme] .divide-slate-100 > * + * { border-color:var(--line); }
+    /* حالات ملونة */
+    html[data-theme] .bg-red-50 { background:color-mix(in srgb,var(--danger) calc(var(--tint-a)*100%),transparent); }
+    html[data-theme] .bg-emerald-50 { background:color-mix(in srgb,var(--success) calc(var(--tint-a)*100%),transparent); }
+    html[data-theme] .bg-amber-50 { background:color-mix(in srgb,var(--warning) calc(var(--tint-a)*100%),transparent); }
+    html[data-theme] .bg-purple-50 { background:color-mix(in srgb,var(--accent-1) calc(var(--tint-a)*100%),transparent); }
+    html[data-theme] .border-red-200, html[data-theme] .border-amber-200 { border-color:var(--line); }
+    /* أزرار رئيسية */
+    html[data-theme] .bg-orange-500, html[data-theme] .bg-slate-900:not(#app-header), html[data-theme] .hy-btn { background:var(--accent-gradient); color:var(--on-accent); box-shadow:var(--btn-glow); border:0; }
+    html[data-theme] .bg-orange-500:hover, html[data-theme] .hover\:bg-orange-600:hover, html[data-theme] .hover\:bg-purple-700:hover { filter:brightness(1.06); }
+    html[data-theme] .bg-emerald-600 { background:var(--success); color:var(--on-accent); }
+    html[data-theme] .bg-purple-600, html[data-theme] .bg-purple-700 { background:var(--accent-gradient); color:var(--on-accent); }
+    html[data-theme] .focus\:ring-orange-400:focus { --tw-ring-color:var(--accent-1); }
+    /* الهيدر */
+    html[data-theme] #app-header { background:var(--surface); border-bottom:1px solid var(--surface-border); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); color:var(--text); box-shadow:var(--shadow); }
+    html[data-theme] #app-header .text-white, html[data-theme] #app-header .text-slate-300 { color:var(--text-nav); }
+    html[data-theme] #app-header .bg-slate-800 { background:var(--field); }
+    html[data-theme] #app-header .border-slate-700 { border-color:var(--line); }
+    html[data-theme] #app-header #user-chip { background:color-mix(in srgb,var(--success) 15%,transparent); color:var(--success); border-color:var(--line); }
+    html[data-theme] #app-header .bg-orange-500 { color:var(--on-accent); }
+    html[data-theme="dark"] .leaflet-tile { filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.7); }
+    html[data-theme="dark"] .leaflet-container { background:#0b1a13; }
+    /* مفتاح الوضع */
+    .hy-toggle { width:2.4rem; height:2.4rem; border-radius:.8rem; border:1px solid var(--line); background:var(--field); color:var(--text); display:inline-flex; align-items:center; justify-content:center; }
+    .hy-toggle svg { width:1.2rem; height:1.2rem; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    /* الواجهة التعريفية */
+    .hy-wrap { max-width:68rem; margin:0 auto; padding:3rem 1rem; }
+    .hy-eyebrow { color:var(--accent-text); font-weight:800; font-size:.8rem; }
+    .hy-h2 { font-size:1.6rem; font-weight:800; margin-top:.4rem; color:var(--text); }
+    .hy-sub { color:var(--text-muted); margin-top:.5rem; max-width:40rem; line-height:1.8; }
+    .hy-card { border:1px solid var(--surface-border); border-radius:1.25rem; padding:1.25rem; }
+    .hy-ico { width:2.75rem; height:2.75rem; border-radius:.9rem; background:var(--accent-gradient); display:flex; align-items:center; justify-content:center; }
+    .hy-ico svg { width:1.4rem; height:1.4rem; stroke:var(--on-accent); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .hy-num { width:2.25rem; height:2.25rem; border-radius:999px; background:var(--accent-gradient); color:var(--on-accent); font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; }
+    .hy-tab { padding:.6rem 1.3rem; border-radius:999px; font-weight:800; font-size:.9rem; border:1px solid var(--line); background:var(--field); color:var(--text-muted); }
+    .hy-tab.on { background:var(--accent-gradient); color:var(--on-accent); border-color:transparent; box-shadow:var(--btn-glow); }
+    .hy-btn { display:inline-block; padding:.85rem 1.7rem; border-radius:.95rem; font-weight:800; cursor:pointer; }
+    .hy-btn.ghost { background:var(--field) !important; color:var(--text) !important; border:1px solid var(--line) !important; box-shadow:none !important; }
+    .hy-hero { text-align:center; padding-top:2rem; }
+    .hy-hero h1 { font-size:2.1rem; line-height:1.4; font-weight:800; color:var(--text); }
+    html[data-theme] .hy-panel.bg-slate-900:not(#app-header) { background:var(--surface); color:var(--text); border:1px solid var(--surface-border); backdrop-filter:blur(14px); box-shadow:var(--shadow); }
+    html[data-theme] #app-header .bg-red-600, html[data-theme] #app-header .bg-red-500 { color:#fff; }
+    html[data-theme] .hy-panel .text-white { color:var(--text); }
+    html[data-theme] .hy-panel .border-slate-800 { border-color:var(--line); }
+    html[data-theme] .bg-emerald-500 { background:var(--success); color:var(--on-accent); }
+    html[data-theme] .text-emerald-400 { color:var(--success); }
+
+    .hy-drawer-panel { background:var(--surface-solid); color:var(--text); border-left:1px solid var(--line); box-shadow:var(--shadow); animation:hy-in .22s ease-out; }
+    @keyframes hy-in { from { transform:translateX(30px); opacity:0 } to { transform:none; opacity:1 } }
+    .hy-menu-item { display:block; width:100%; text-align:center; padding:.8rem 1rem; border-radius:.9rem; font-weight:700; font-size:.9rem; border:1px solid var(--line); background:var(--field); color:var(--text); }
+    .hy-sheet { background:linear-gradient(180deg,var(--bg-1),var(--bg-2)); color:var(--text); }
+    html[data-theme="dark"] .hy-sheet { background:var(--bg-1); }
+    .hy-sheet-head { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.8rem 1rem; background:var(--surface); border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
+    .hy-bubble { max-width:80%; padding:.55rem .8rem; border-radius:1rem; font-size:.9rem; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+    .hy-bubble.me { background:var(--accent-gradient); color:var(--on-accent); align-self:flex-start; border-bottom-right-radius:.3rem; }
+    .hy-bubble.them { background:var(--surface); border:1px solid var(--line); color:var(--text); align-self:flex-end; border-bottom-left-radius:.3rem; }
+    .hy-bubble.sys { background:transparent; color:var(--text-muted); align-self:center; font-size:.75rem; text-align:center; }
+    #chat-msgs { display:flex; flex-direction:column; }
+    .hy-badge { display:inline-block; min-width:1.2rem; padding:0 .35rem; margin-inline-start:.3rem; border-radius:999px; background:var(--danger); color:#fff; font-size:.7rem; line-height:1.2rem; text-align:center; }
+    .hy-pin { width:26px; height:26px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,.35); border:2px solid #fff; }
+    .hy-pin span { transform:rotate(45deg); font-size:11px; font-weight:800; color:#fff; }
+    .hy-truck { width:34px; height:34px; border-radius:50%; background:var(--accent-gradient); border:3px solid #fff; box-shadow:0 0 0 6px rgba(226,105,58,.25),0 3px 10px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; animation:hy-pulse 2s infinite; }
+    .hy-truck svg { width:16px; height:16px; stroke:var(--on-accent); fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+    @keyframes hy-pulse { 0%,100% { box-shadow:0 0 0 4px rgba(226,105,58,.30),0 3px 10px rgba(0,0,0,.4) } 50% { box-shadow:0 0 0 12px rgba(226,105,58,0),0 3px 10px rgba(0,0,0,.4) } }
+    html[data-theme="dark"] .hy-truck { animation-name:hy-pulse-d; } @keyframes hy-pulse-d { 0%,100% { box-shadow:0 0 0 4px rgba(16,185,129,.35),0 3px 10px rgba(0,0,0,.5) } 50% { box-shadow:0 0 0 12px rgba(16,185,129,0),0 3px 10px rgba(0,0,0,.5) } }
+    .gps-ok { background:color-mix(in srgb,var(--success) 18%,transparent); color:var(--success); border:1px solid var(--line); }
+    .gps-bad { background:color-mix(in srgb,var(--danger) 18%,transparent); color:var(--danger); border:1px solid var(--line); }
+    html[data-theme] .bg-purple-100 { background:color-mix(in srgb,var(--accent-1) 22%,transparent); }
+    .hy-grad-text { background:var(--accent-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
     .tabular-nums { font-variant-numeric: tabular-nums; }
     #map { height: 320px; width: 100%; border-radius: 0.75rem; z-index: 1; }
     @media print { .no-print { display: none !important; } }
@@ -83,31 +194,64 @@
 <body class="text-slate-900">
 
   <!-- Top Navbar -->
-  <header id="app-header" class="hidden sticky top-0 z-50 bg-slate-900 text-white shadow-lg no-print">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+  <header id="app-header" class="hidden sticky top-0 z-50 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <img src="assets/hayo-icon-192.png" alt="Hayo" class="w-10 h-10 rounded-xl shadow" />
+        <img src="assets/light/hayo-icon-192.png" alt="Hayo" class="w-10 h-10 rounded-xl shadow hy-light-only" /><img src="assets/dark/hayo-icon-192.png" alt="Hayo" class="w-10 h-10 rounded-xl shadow hy-dark-only" />
         <div>
           <h1 class="font-extrabold text-lg leading-tight">هايو <span class="text-orange-400 text-xs font-semibold">LogTech</span></h1>
           <p class="text-xs text-slate-400">منصة نقل البضائع والأساطيل عند الطلب</p>
         </div>
       </div>
-
-      <!-- Role Switcher -->
-      <div id="role-switcher" class="hidden flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-sm">
+      <div class="flex items-center gap-2">
+        <span id="gps-chip" class="hidden text-xs font-bold px-2.5 py-1 rounded-full gps-status whitespace-nowrap truncate max-w-[6.5rem]"></span>
+        <button type="button" class="hy-toggle" onclick="hyToggleTheme()" aria-label="تبديل الوضع الليلي"><svg viewBox="0 0 24 24" class="hy-dark-only"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" class="hy-light-only"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+        <button type="button" id="menu-btn" class="hy-toggle" onclick="hyMenu(true)" aria-label="القائمة"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <div id="hy-drawer" class="hidden fixed inset-0 z-[60] no-print">
+    <div class="absolute inset-0 bg-black/50" onclick="hyMenu(false)"></div>
+    <aside class="hy-drawer-panel absolute top-0 bottom-0 right-0 w-[82%] max-w-xs p-4 flex flex-col gap-3 overflow-y-auto">
+      <div class="flex items-center justify-between"><h2 class="font-extrabold text-lg">القائمة</h2><button type="button" class="hy-toggle" onclick="hyMenu(false)" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <span id="user-chip" class="px-2.5 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold text-sm text-center"></span>
+      <div id="role-switcher" class="hidden flex flex-col gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-sm">
         <button onclick="switchRole('shipper')" id="btn-shipper" class="px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-white transition">التاجر / المصنع</button>
         <button onclick="switchRole('driver')" id="btn-driver" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">السائق</button>
         <button onclick="switchRole('admin')" id="btn-admin" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">برج العمليات</button>
       </div>
-
-      <!-- Actions -->
-      <div class="flex items-center gap-2 text-xs">
-        <span id="user-chip" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold"></span>
-        <button id="refresh-btn" onclick="refreshAndRender(true)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300">تحديث</button>
-        <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold">تسجيل الخروج</button>
-      </div>
+      <button type="button" id="menu-profile" class="hy-menu-item hidden" onclick="hyMenu(false);openMyProfile()">ملفي كسائق (نبذة عني)</button>
+      <button type="button" id="refresh-btn" class="hy-menu-item" onclick="refreshAndRender(true);hyMenu(false)">تحديث البيانات</button>
+      <a href="privacy.html" class="hy-menu-item">سياسة الخصوصية</a>
+      <a href="terms.html" class="hy-menu-item">الشروط والأحكام</a>
+      <button type="button" onclick="hyMenu(false);logout()" class="hy-menu-item mt-auto" style="background:var(--danger);color:#fff;border-color:transparent">تسجيل الخروج</button>
+    </aside>
+  </div>
+  <!-- ===== ملف السائق ===== -->
+  <div id="prof-modal" class="hidden fixed inset-0 z-[66] flex flex-col no-print hy-sheet">
+    <div class="hy-sheet-head"><div><h3 id="prof-title" class="font-extrabold">ملف السائق</h3><p id="prof-sub" class="text-xs" style="color:var(--text-muted)"></p></div><button type="button" class="hy-toggle" onclick="closeProf()" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="prof-body" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+  </div>
+  <!-- ===== المحادثة ===== -->
+  <div id="chat-modal" class="hidden fixed inset-0 z-[65] flex flex-col no-print hy-sheet">
+    <div class="hy-sheet-head"><div><h3 id="chat-title" class="font-extrabold">المحادثة</h3><p id="chat-sub" class="text-xs" style="color:var(--text-muted)"></p></div><button type="button" class="hy-toggle" onclick="closeChat()" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="chat-msgs" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+    <div id="chat-err" class="hidden text-xs font-bold px-4" style="color:var(--danger)"></div>
+    <form id="chat-form" class="p-3 flex gap-2" onsubmit="return sendChat(event)">
+      <input id="chat-input" maxlength="1000" autocomplete="off" placeholder="اكتب رسالتك..." class="flex-1 border border-slate-300 rounded-xl px-3 py-2.5" />
+      <button id="chat-send" class="px-5 rounded-xl bg-orange-500 font-extrabold text-sm">إرسال</button>
+    </form>
+  </div>
+  <!-- ===== تتبع الرحلة ===== -->
+  <div id="track-modal" class="hidden fixed inset-0 z-[65] flex flex-col no-print hy-sheet">
+    <div class="hy-sheet-head"><div><h3 id="track-title" class="font-extrabold">تتبع الرحلة</h3><p id="track-sub" class="text-xs" style="color:var(--text-muted)"></p></div><button type="button" class="hy-toggle" onclick="closeTrack()" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="track-map" class="flex-1" style="min-height:50vh"></div>
+    <div class="p-4 space-y-2">
+      <div id="track-info" class="text-sm font-bold"></div>
+      <div id="track-note" class="text-xs" style="color:var(--text-muted)"></div>
+      <div class="flex gap-2"><button id="track-chat-btn" class="flex-1 py-2.5 rounded-xl bg-orange-500 font-extrabold text-sm">المحادثة</button><a id="track-nav" target="_blank" rel="noopener" class="hidden flex-1 py-2.5 rounded-xl hy-menu-item text-center font-extrabold text-sm">فتح الملاحة في خرائط جوجل</a></div>
     </div>
-  </header>
+  </div>
 
   <main id="app-main" class="hidden max-w-7xl mx-auto px-4 py-6">
 
@@ -295,7 +439,7 @@
           </label>
 
           <!-- Fare Breakdown -->
-          <div class="bg-slate-900 text-white rounded-2xl p-4 space-y-2">
+          <div class="hy-panel bg-slate-900 text-white rounded-2xl p-4 space-y-2">
             <div class="flex justify-between text-xs text-slate-400">
               <span>المسافة التقديرية: <strong id="calc-dist" class="text-white tabular-nums">65 كم</strong></span>
               <span>الزمن المتوقع: <strong id="calc-time" class="text-white tabular-nums">1 س 15 د</strong></span>
@@ -333,7 +477,7 @@
     <section id="view-driver" class="hidden space-y-6">
       <div id="driver-kyc-banner" class="hidden rounded-2xl p-4 text-sm font-semibold"></div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="anim-card bg-slate-900 text-white p-5 rounded-2xl flex items-center justify-between">
+        <div class="anim-card hy-panel bg-slate-900 text-white p-5 rounded-2xl flex items-center justify-between">
           <div>
             <p class="text-xs text-slate-400"><span id="driver-title">حالة السائق</span></p>
             <h3 id="driver-status-text" class="text-lg font-extrabold text-emerald-400 mt-1">متاح لاستقبال الطلبات</h3>
@@ -442,10 +586,65 @@
   </div>
 
   <!-- Auth Screen -->
-  <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-600">
-    <div class="anim-card w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+  <div id="auth-screen" class="min-h-screen">
+   <!-- 1) التعريف أولاً -->
+   <div id="hy-intro-view">
+    <div class="max-w-6xl mx-auto px-4 pt-4 flex items-center justify-between">
+      <span><img src="assets/light/hayo-logo-no-arabic.png" alt="Hayo" class="h-10 w-auto hy-light-only" /><img src="assets/dark/hayo-logo-no-arabic.png" alt="Hayo" class="h-10 w-auto hy-dark-only" /></span>
+      <div class="flex items-center gap-2"><button type="button" class="hy-toggle" onclick="hyToggleTheme()" aria-label="تبديل الوضع الليلي"><svg viewBox="0 0 24 24" class="hy-dark-only"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" class="hy-light-only"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button class="hy-btn bg-orange-500" style="padding:.55rem 1.2rem" onclick="hyShowLogin('login')">دخول</button></div>
+    </div>
+    <section class="hy-wrap hy-hero">
+      <p class="hy-eyebrow">منصة نقل البضائع عند الطلب في مصر</p>
+      <h1 class="mt-3">شاحنة مناسبة لبضاعتك،<br><span class="hy-grad-text">في دقائق</span></h1>
+      <p class="hy-sub mx-auto">هايو تربط التاجر وصاحب المصنع بسائقي الشاحنات المعتمدين. اطلب النقل، اعرف السعر فورًا، تابع الرحلة، واستلم بضاعتك برمز تسليم آمن.</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <button class="hy-btn bg-orange-500" onclick="hyShowLogin('register')">ابدأ الآن</button>
+        <button class="hy-btn ghost" onclick="hyShowLogin('login')">لدي حساب، دخول</button>
+      </div>
+    </section>
+    <div class="hy-wrap" style="padding-top:0">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="hy-card"><div class="hy-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1 1.1-1.5 2.5-1.5s2.5.6 2.5 1.6-1 1.4-2.5 1.8-2.5.8-2.5 1.8 1.1 1.6 2.5 1.6 2.5-.5 2.5-1.5"/></svg></div><h3 class="font-extrabold mt-3">سعر فوري</h3><p class="text-sm mt-1" style="color:var(--text-muted)">اختار نقطة التحميل والتسليم ونوع الشاحنة وشوف السعر قبل ما تطلب.</p></div>
+        <div class="hy-card"><div class="hy-ico"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><h3 class="font-extrabold mt-3">تتبّع الرحلة</h3><p class="text-sm mt-1" style="color:var(--text-muted)">تعرف حالة طلبك من لحظة قبول السائق لحد التسليم.</p></div>
+        <div class="hy-card"><div class="hy-ico"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h3 class="font-extrabold mt-3">تسليم برمز OTP</h3><p class="text-sm mt-1" style="color:var(--text-muted)">الشحنة ما تتسلّم إلا بالرمز اللي معاك، فتتأكد إنها وصلت للشخص الصح.</p></div>
+        <div class="hy-card"><div class="hy-ico"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><h3 class="font-extrabold mt-3">تأكيد البضاعة بالصورة</h3><p class="text-sm mt-1" style="color:var(--text-muted)">في الاستلام من نقطة على الخريطة، السائق يرسل صورة البضاعة وانت تؤكدها قبل التحميل.</p></div>
+      </div>
+    </div>
+    <div class="hy-wrap" style="padding-top:0">
+      <div class="hy-card" style="padding:1.5rem">
+        <p class="hy-eyebrow">كيف تشتغل؟</p>
+        <h2 class="hy-h2">أربع خطوات بس</h2>
+        <div class="flex gap-2 mt-5 flex-wrap">
+          <button id="hy-tab-shipper" class="hy-tab on" onclick="hyTab('shipper')">أنا تاجر / صاحب شحنة</button>
+          <button id="hy-tab-driver" class="hy-tab" onclick="hyTab('driver')">أنا سائق</button>
+        </div>
+        <div id="hy-steps-shipper" class="grid sm:grid-cols-2 gap-4 mt-6">
+          <div class="flex gap-3"><span class="hy-num">1</span><div><h3 class="font-extrabold">أنشئ حساب</h3><p class="hy-sub" style="margin-top:.2rem">برقم الجوال وكلمة مرور، من غير انتظار.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">2</span><div><h3 class="font-extrabold">اطلب الشحنة</h3><p class="hy-sub" style="margin-top:.2rem">حدد من أين وإلى أين، ونوع الشاحنة والوزن، وشوف السعر.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">3</span><div><h3 class="font-extrabold">سائق معتمد يقبل</h3><p class="hy-sub" style="margin-top:.2rem">سائق معتمد يقبل الطلب، وتتابع حالته أول بأول.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">4</span><div><h3 class="font-extrabold">استلم وقيّم</h3><p class="hy-sub" style="margin-top:.2rem">اعطِ السائق رمز التسليم عند الوصول وقيّم الرحلة.</p></div></div>
+        </div>
+        <div id="hy-steps-driver" class="grid sm:grid-cols-2 gap-4 mt-6 hidden">
+          <div class="flex gap-3"><span class="hy-num">1</span><div><h3 class="font-extrabold">سجّل كسائق</h3><p class="hy-sub" style="margin-top:.2rem">ارفع بطاقتك وصورتك وصورة المركبة ورقم اللوحة.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">2</span><div><h3 class="font-extrabold">اعتماد الإدارة</h3><p class="hy-sub" style="margin-top:.2rem">نراجع وثائقك ونفعّل حسابك عشان العملاء يثقوا فيك.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">3</span><div><h3 class="font-extrabold">اقبل الرحلات</h3><p class="hy-sub" style="margin-top:.2rem">شوف الطلبات المتاحة واقبل اللي يناسبك.</p></div></div>
+          <div class="flex gap-3"><span class="hy-num">4</span><div><h3 class="font-extrabold">سلّم واكسب</h3><p class="hy-sub" style="margin-top:.2rem">سلّم بالرمز، وتتسجل رحلتك وأرباحك وتقييمك.</p></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="hy-wrap text-center" style="padding-top:0">
+      <button class="hy-btn bg-orange-500" onclick="hyShowLogin('register')">ابدأ الآن</button>
+      <p class="hy-sub mx-auto mt-6 text-sm">هايو منصة وسيطة بين التاجر والسائق، وحسابات السائقين تتراجع وثائقها قبل التفعيل. <a href="privacy.html" class="underline">سياسة الخصوصية</a> · <a href="terms.html" class="underline">الشروط والأحكام</a></p>
+    </div>
+   </div>
+   <!-- 2) الدخول / التسجيل -->
+   <div id="hy-login-view" class="hidden min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-md flex items-center justify-between mb-3">
+      <button class="text-sm font-bold" style="color:var(--text-nav)" onclick="hyShowIntro()">→ ما هي هايو؟</button><button type="button" class="hy-toggle" onclick="hyToggleTheme()" aria-label="تبديل الوضع الليلي"><svg viewBox="0 0 24 24" class="hy-dark-only"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" class="hy-light-only"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    </div>
+    <div class="anim-card w-full max-w-md bg-white rounded-3xl p-6 sm:p-8">
       <div class="text-center mb-6">
-        <img src="assets/hayo-logo.png" alt="Hayo هايو" class="mx-auto h-24 w-auto" />
+        <img src="assets/light/hayo-logo.png" alt="Hayo هايو" class="mx-auto h-24 w-auto hy-light-only" /><img src="assets/dark/hayo-logo.png" alt="Hayo هايو" class="mx-auto h-24 w-auto hy-dark-only" />
         <h2 class="sr-only">هايو</h2>
         <p class="text-sm text-slate-500">منصة النقل واللوجستيات الذكية عند الطلب</p>
       </div>
@@ -486,6 +685,7 @@
       <p id="auth-error" class="hidden mt-3 text-sm text-red-600 font-semibold text-center" role="alert"></p>
       <p class="mt-4 text-xs text-slate-400 text-center"><a href="privacy.html" class="underline">سياسة الخصوصية</a> · <a href="terms.html" class="underline">الشروط والأحكام</a></p>
     </div>
+   </div>
   </div>
 
   <!-- Waybill Print Modal -->
@@ -657,16 +857,18 @@
     /* ---------- تحميل البيانات (RLS بتفلتر حسب الدور) ---------- */
     async function loadData() {
       if (!me) return;
-      const [sh, pr, kc, sc] = await Promise.all([
+      const [sh, pr, kc, sc, cm] = await Promise.all([
         sb.from("shipments").select("*").order("created_at", { ascending: false }).limit(500),
         sb.from("profiles").select("*"),
         sb.from("driver_kyc").select("*"),
-        sb.from("shipment_secrets").select("*")
+        sb.from("shipment_secrets").select("*"),
+        sb.from("messages").select("id,shipment_id,sender_id").order("id", { ascending: false }).limit(400)
       ]);
       const bad = [sh, pr, kc, sc].find(r => r.error);
       if (bad) { toast("تعذر تحميل البيانات: " + errMsg(bad.error)); return; }
       data.shipments = sh.data; data.profiles = pr.data; data.kycs = kc.data;
       data.secrets = {}; sc.data.forEach(x => data.secrets[x.shipment_id] = x.otp);
+      data.chatMeta = {}; if (!cm.error) cm.data.forEach(m => (data.chatMeta[m.shipment_id] = data.chatMeta[m.shipment_id] || []).push(m));
       const mine = data.profiles.find(p => p.id === me.id); if (mine) me = mine;
     }
     async function refreshAndRender(manual) {
@@ -784,6 +986,7 @@
 
     function switchRole(role) {
       if (!me) return;
+      hyMenu(false);
       if (me.role !== "admin") role = me.role;
       currentRole = role;
       ["shipper", "driver", "admin"].forEach(r => {
@@ -846,7 +1049,7 @@
       if (s.goods_status === "pending") return '<div class="text-xs font-bold text-amber-700 bg-amber-50 rounded-lg px-3 py-2">تم إرسال الصورة. بانتظار تأكيد العميل...</div>';
       return (s.goods_status === "rejected" ? '<div class="text-xs font-bold text-red-700 bg-red-50 rounded-lg px-3 py-2">العميل رفض الصورة. صوّر البضاعة مرة أخرى بوضوح.</div>' : '') +
         '<div class="space-y-2"><p class="text-xs text-slate-600">الطلب من نقطة على الخريطة: أرسل للعميل صورة للبضاعة لتأكيدها قبل بدء الرحلة.</p>' +
-        '<div class="flex gap-2"><input id="gp-' + esc(s.id) + '" type="file" accept="image/*" capture="environment" class="flex-1 text-xs border border-slate-300 rounded-xl p-1.5" />' +
+        '<div class="flex gap-2"><input id="gp-' + esc(s.id) + '" type="file" accept="image/*" capture="environment" class="flex-1 min-w-0 text-xs border border-slate-300 rounded-xl p-1.5" />' +
         '<button id="gpbtn-' + esc(s.id) + '" onclick="submitGoodsPhoto(\'' + esc(s.id) + '\')" class="px-3 rounded-xl bg-slate-900 text-white text-xs font-extrabold disabled:opacity-60">إرسال للعميل</button></div><div id="gpmsg-' + esc(s.id) + '" class="hidden"></div></div>';
     }
 
@@ -865,7 +1068,7 @@
           '<div class="flex flex-wrap items-center justify-between gap-2"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' + statusBadge(s.status) + '</div>' +
           '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) + progressTimeline(s) +
           '<div class="text-xs text-slate-500">' + esc(truckLabel(s)) + ' · ' + esc(s.weight) + ' طن · ' + esc(s.cargo) + '</div>' +
-          '<div class="text-xs text-slate-500">السائق: ' + esc(driverLabel(s.driver_id)) + '</div>' + goodsBlockShipper(s) + rate +
+          '<div class="text-xs text-slate-500">السائق: ' + esc(driverLabel(s.driver_id)) + (s.driver_id ? ' · <button onclick="openDriverProfile(\'' + esc(s.driver_id) + '\')" class="underline font-bold" style="color:var(--accent-text)">ملف السائق</button>' : '') + '</div>' + goodsBlockShipper(s) + tripButtons(s) + rate +
           '<div class="flex flex-wrap items-center justify-between gap-2 pt-1"><span class="font-extrabold text-orange-600 tabular-nums">' + fmt(s.price) + ' ج.م</span>' + otpBox +
           '<span class="flex gap-2">' + cancelBtn + '<button onclick="openWaybill(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold">عرض البوليصة</button></span></div></div>';
       }).join(""));
@@ -922,7 +1125,7 @@
         return '<div class="anim-card transition duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-slate-200 rounded-xl p-4 space-y-2" style="animation-delay:' + Math.min(i * 70, 420) + 'ms">' +
           '<div class="flex justify-between items-center"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' + statusBadge(s.status) + '</div>' +
           '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) + mapsLink(s) + progressTimeline(s) +
-          '<div class="text-xs text-slate-500">' + esc(s.cargo) + ' · ' + esc(s.weight) + ' طن</div>' + step + '</div>';
+          '<div class="text-xs text-slate-500">' + esc(s.cargo) + ' · ' + esc(s.weight) + ' طن</div>' + '<div class="gps-status hidden text-xs font-bold rounded-lg px-3 py-2"></div>' + tripButtons(s) + step + '</div>';
       }).join(""));
     }
 
@@ -989,6 +1192,7 @@
     function renderAll() {
       if (!me) return;
       renderShipperList(); renderDriver(); renderAdmin(); hydrateGoodsImgs();
+      syncGps(); updateGpsUI(); autoOpenChats();
     }
 
     function openWaybill(id) {
@@ -1095,6 +1299,226 @@
       if (!p.active) { await sb.auth.signOut(); authError("هذا الحساب موقوف. تواصل مع الإدارة."); return; }
       me = p; await loadData(); showApp(); startPolling();
     }
+    function hyTab(t) {
+      ["shipper","driver"].forEach(r => { document.getElementById("hy-steps-" + r).classList.toggle("hidden", r !== t); document.getElementById("hy-tab-" + r).classList.toggle("on", r === t); });
+    }
+    function hyToggleTheme() {
+      const n = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", n);
+      try { localStorage.setItem("hy-theme", n); } catch (e) {}
+    }
+    function hyShowLogin(tab) {
+      document.getElementById("hy-intro-view").classList.add("hidden");
+      document.getElementById("hy-login-view").classList.remove("hidden");
+      authTab(tab || "login"); window.scrollTo(0, 0);
+    }
+    function hyShowIntro() {
+      document.getElementById("hy-login-view").classList.add("hidden");
+      document.getElementById("hy-intro-view").classList.remove("hidden"); window.scrollTo(0, 0);
+    }
+    /* ---------- القائمة الجانبية ---------- */
+    function hyMenu(open) { document.getElementById("hy-drawer").classList.toggle("hidden", !open); }
+
+    /* ---------- مشاركة موقع السائق المباشر ---------- */
+    let gpsWatch = null, gpsLastSent = 0, gpsWake = null, gpsState = "off", gpsShip = null;
+    function activeDriverShipment() { return me ? data.shipments.find(s => s.driver_id === me.id && (s.status === "assigned" || s.status === "in_transit")) : null; }
+    function updateGpsUI() {
+      const on = gpsState === "on", bad = gpsState === "denied" || gpsState === "error" || gpsState === "unsupported";
+      const txt = on ? "الموقع شغال" : gpsState === "starting" ? "جاري تحديد موقعك..." : gpsState === "denied" ? "فعّل إذن الموقع ليشوفك العميل" : gpsState === "unsupported" ? "الجهاز لا يدعم الموقع" : gpsState === "error" ? "تعذر تحديد الموقع، تأكد من GPS" : "";
+      document.querySelectorAll(".gps-status").forEach(el => {
+        el.textContent = txt; el.classList.toggle("hidden", !txt);
+        el.classList.toggle("gps-ok", on || gpsState === "starting"); el.classList.toggle("gps-bad", bad);
+      });
+    }
+    async function gpsRequestWake() { try { if (navigator.wakeLock && !gpsWake) { gpsWake = await navigator.wakeLock.request("screen"); gpsWake.addEventListener("release", () => { gpsWake = null; }); } } catch (e) {} }
+    function syncGps() {
+      const act = (me && me.role !== "shipper") ? activeDriverShipment() : null;
+      if (!act) { if (gpsWatch !== null) { navigator.geolocation.clearWatch(gpsWatch); gpsWatch = null; } if (gpsWake) { gpsWake.release(); gpsWake = null; } gpsShip = null; gpsState = "off"; updateGpsUI(); return; }
+      gpsShip = act.id;
+      if (gpsWatch !== null) return;
+      if (!navigator.geolocation) { gpsState = "unsupported"; updateGpsUI(); return; }
+      gpsState = "starting"; updateGpsUI(); gpsRequestWake();
+      gpsWatch = navigator.geolocation.watchPosition(pos => {
+        gpsState = "on"; updateGpsUI();
+        const now = Date.now(); if (now - gpsLastSent < 5000 || !gpsShip) return; gpsLastSent = now;
+        const c = pos.coords;
+        sb.rpc("update_location", { p_id: gpsShip, p_lat: c.latitude, p_lng: c.longitude, p_heading: (c.heading == null || isNaN(c.heading)) ? null : c.heading, p_speed: (c.speed == null || isNaN(c.speed)) ? null : c.speed }).then(r => { if (r.error) { gpsState = "error"; updateGpsUI(); } });
+      }, err => { gpsState = err && err.code === 1 ? "denied" : "error"; updateGpsUI(); }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
+    }
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && gpsWatch !== null) gpsRequestWake(); });
+
+    /* ---------- ملف السائق ---------- */
+    function closeProf() { document.getElementById("prof-modal").classList.add("hidden"); }
+    function profRow(label, val) { return val ? '<div class="hy-card"><p class="text-xs font-bold" style="color:var(--text-muted)">' + label + '</p><p class="mt-1 text-sm leading-7" style="white-space:pre-wrap">' + esc(val) + '</p></div>' : ""; }
+    async function openDriverProfile(driverId) {
+      const p = profileOf(driverId), k = kycOf(driverId);
+      document.getElementById("prof-title").textContent = p ? p.name : "السائق";
+      document.getElementById("prof-sub").textContent = k ? "سيارة: " + k.plate + (k.from_place ? " · من: " + k.from_place : "") : "";
+      const body = document.getElementById("prof-body"); body.innerHTML = '<div class="hy-card text-sm">جاري التحميل...</div>';
+      document.getElementById("prof-modal").classList.remove("hidden");
+      const [pr, st] = await Promise.all([sb.from("driver_profiles").select("*").eq("driver_id", driverId).maybeSingle(), sb.rpc("driver_stats", { p_driver: driverId })]);
+      const d = pr.data || {}, t = st.data || {};
+      const stats = '<div class="grid grid-cols-3 gap-2 text-center"><div class="hy-card"><p class="text-lg font-extrabold">' + (t.trips || 0) + '</p><p class="text-xs" style="color:var(--text-muted)">رحلة منفذة</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (t.rating ? "⭐ " + t.rating : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">التقييم</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (d.years != null ? d.years : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">سنوات الخبرة</p></div></div>';
+      const rows = profRow("نبذة عن السائق", d.bio) + profRow("مناطق العمل", d.areas) + profRow("عن السيارة", d.vehicle_note);
+      body.innerHTML = stats + (rows || '<div class="hy-card text-sm" style="color:var(--text-muted)">لم يكتب السائق نبذة بعد.</div>');
+    }
+    async function openMyProfile() {
+      document.getElementById("prof-title").textContent = "ملفي كسائق";
+      document.getElementById("prof-sub").textContent = "اكتب نبذة عن شغلك، تظهر للتجار اللي بتشتغل معاهم.";
+      const body = document.getElementById("prof-body"); body.innerHTML = '<div class="hy-card text-sm">جاري التحميل...</div>';
+      document.getElementById("prof-modal").classList.remove("hidden");
+      const r = await sb.from("driver_profiles").select("*").eq("driver_id", me.id).maybeSingle(); const d = r.data || {};
+      const f = "w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm";
+      body.innerHTML = '<form class="space-y-3" onsubmit="return saveMyProfile(event)">' +
+        '<label class="block text-xs font-bold">نبذة عنك وطريقة شغلك<textarea id="pf-bio" rows="5" maxlength="600" class="' + f + ' mt-1" placeholder="مثال: سواق نقل ثقيل بخبرة 8 سنين، ملتزم بالمواعيد، بحافظ على البضاعة...">' + esc(d.bio || "") + '</textarea></label>' +
+        '<label class="block text-xs font-bold">سنوات الخبرة<input id="pf-years" type="number" min="0" max="60" inputmode="numeric" class="' + f + ' mt-1" value="' + (d.years != null ? esc(d.years) : "") + '" /></label>' +
+        '<label class="block text-xs font-bold">مناطق الشغل<input id="pf-areas" maxlength="120" class="' + f + ' mt-1" placeholder="دمياط، القاهرة، الدلتا" value="' + esc(d.areas || "") + '" /></label>' +
+        '<label class="block text-xs font-bold">عن السيارة<input id="pf-veh" maxlength="200" class="' + f + ' mt-1" placeholder="جامبو 2022، مبردة، سقف مغلق" value="' + esc(d.vehicle_note || "") + '" /></label>' +
+        '<div id="pf-msg" class="hidden text-xs font-bold"></div>' +
+        '<button id="pf-save" class="w-full py-3 rounded-xl bg-orange-500 font-extrabold text-sm">حفظ</button></form>';
+    }
+    async function saveMyProfile(e) {
+      e.preventDefault(); const msg = document.getElementById("pf-msg"), btn = document.getElementById("pf-save"); btn.disabled = true;
+      const y = document.getElementById("pf-years").value;
+      const r = await sb.rpc("save_driver_profile", { p_bio: document.getElementById("pf-bio").value, p_years: y === "" ? null : parseInt(y, 10), p_areas: document.getElementById("pf-areas").value, p_vehicle: document.getElementById("pf-veh").value });
+      btn.disabled = false; msg.classList.remove("hidden");
+      if (r.error) { msg.style.color = "var(--danger)"; msg.textContent = "لم يتم الحفظ: " + errMsg(r.error); return false; }
+      msg.style.color = "var(--success)"; msg.textContent = "تم الحفظ. التجار هيشوفوا ملفك."; toast("تم حفظ ملفك"); return false;
+    }
+
+    /* ---------- المحادثة ---------- */
+    let chatShip = null, chatTimer = null, chatFirst = true;
+    const chatSeen = (() => { try { return JSON.parse(localStorage.getItem("hy-chat-seen") || "{}"); } catch (e) { return {}; } })();
+    const chatOpened = (() => { try { return JSON.parse(localStorage.getItem("hy-chat-opened") || "{}"); } catch (e) { return {}; } })();
+    const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+    function chatUnread(id) { const m = (data.chatMeta || {})[id]; if (!m) return 0; return m.filter(x => x.sender_id && x.sender_id !== me.id && x.id > (chatSeen[id] || 0)).length; }
+    function chatBtn(s) {
+      const n = chatUnread(s.id);
+      return '<button onclick="openChat(\'' + esc(s.id) + '\')" class="flex-1 py-2 rounded-xl bg-orange-500 text-white font-extrabold text-xs">المحادثة' + (n ? '<span class="hy-badge">' + n + '</span>' : '') + '</button>';
+    }
+    function tripButtons(s) {
+      if (!s.driver_id || (s.status !== "assigned" && s.status !== "in_transit")) return "";
+      return '<div class="flex gap-2">' + chatBtn(s) + '<button onclick="openTrack(\'' + esc(s.id) + '\')" class="flex-1 py-2 rounded-xl hy-menu-item text-xs" style="padding:.5rem">تتبع على الخريطة</button></div>';
+    }
+    function otherParty(s) { return me.id === s.driver_id ? "العميل" : driverLabel(s.driver_id); }
+    function openChat(id) {
+      const s = data.shipments.find(x => x.id === id); if (!s) return;
+      chatShip = id; chatFirst = true; chatOpened[id] = 1; saveLS("hy-chat-opened", chatOpened);
+      document.getElementById("chat-title").textContent = "محادثة الطلب " + id;
+      document.getElementById("chat-sub").textContent = "مع: " + otherParty(s);
+      const live = (s.status === "assigned" || s.status === "in_transit");
+      document.getElementById("chat-input").disabled = !live; document.getElementById("chat-send").disabled = !live;
+      document.getElementById("chat-input").placeholder = live ? "اكتب رسالتك..." : "المحادثة انتهت";
+      document.getElementById("chat-err").classList.add("hidden");
+      document.getElementById("chat-modal").classList.remove("hidden");
+      document.getElementById("chat-msgs").innerHTML = "";
+      loadChat(); clearInterval(chatTimer); chatTimer = setInterval(loadChat, 3000);
+    }
+    function closeChat() { document.getElementById("chat-modal").classList.add("hidden"); clearInterval(chatTimer); chatShip = null; renderAll(); }
+    async function loadChat() {
+      if (!chatShip) return; const id = chatShip;
+      const r = await sb.from("messages").select("*").eq("shipment_id", id).order("id").limit(300);
+      if (r.error || id !== chatShip) return;
+      const box = document.getElementById("chat-msgs");
+      const near = chatFirst || (box.scrollHeight - box.scrollTop - box.clientHeight < 80);
+      const html = r.data.map(m => m.sender_id ? '<div class="hy-bubble ' + (m.sender_id === me.id ? "me" : "them") + '">' + esc(m.body) + '<div style="font-size:.65rem;opacity:.7;margin-top:2px">' + new Date(m.created_at).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) + '</div></div>' : '<div class="hy-bubble sys">' + esc(m.body) + '</div>').join("");
+      if (box.__h !== html) { box.innerHTML = html || '<div class="hy-bubble sys">ابدأ المحادثة.</div>'; box.__h = html; if (near) box.scrollTop = box.scrollHeight; }
+      chatFirst = false;
+      if (r.data.length) { chatSeen[id] = r.data[r.data.length - 1].id; saveLS("hy-chat-seen", chatSeen); }
+    }
+    async function sendChat(e) {
+      e.preventDefault(); const inp = document.getElementById("chat-input"), err = document.getElementById("chat-err"), v = inp.value.trim();
+      if (!v || !chatShip) return false;
+      document.getElementById("chat-send").disabled = true; err.classList.add("hidden");
+      const r = await sb.rpc("send_message", { p_id: chatShip, p_body: v });
+      document.getElementById("chat-send").disabled = false;
+      if (r.error) { err.textContent = "لم تُرسل الرسالة: " + errMsg(r.error); err.classList.remove("hidden"); return false; }
+      inp.value = ""; chatFirst = true; await loadChat(); inp.focus(); return false;
+    }
+    function autoOpenChats() {
+      if (!me || chatShip || !document.getElementById("track-modal").classList.contains("hidden")) return;
+      const s = data.shipments.find(x => (x.shipper_id === me.id || x.driver_id === me.id) && x.status === "assigned" && x.driver_id && !chatOpened[x.id] && (data.chatMeta || {})[x.id]);
+      if (s) { toast("تم قبول الطلب " + s.id + ". افتحنا المحادثة للاتفاق."); openChat(s.id); }
+    }
+
+    /* ---------- تتبع الرحلة والمسار ---------- */
+    const trk = { id: null, map: null, layers: [], timer: null, routeAt: 0, fitted: false, route: null, truck: null };
+    function endpointsOf(s) {
+      const o = s.origin_key === "custom" ? (s.origin_lat != null ? [Number(s.origin_lat), Number(s.origin_lng)] : null) : (LOCATIONS[s.origin_key] || {}).coords;
+      const d = s.dest_key === "custom" ? (s.dest_lat != null ? [Number(s.dest_lat), Number(s.dest_lng)] : null) : (LOCATIONS[s.dest_key] || {}).coords;
+      return { o: o || null, d: d || null };
+    }
+    function hav(a, b) { const R = 6371, t = x => x * Math.PI / 180, dl = t(b[0] - a[0]), dn = t(b[1] - a[1]); const h = Math.sin(dl / 2) ** 2 + Math.cos(t(a[0])) * Math.cos(t(b[0])) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+    const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    function pinIcon(label, color) { return L.divIcon({ className: "", html: '<div class="hy-pin" style="background:' + color + '"><span>' + label + '</span></div>', iconSize: [26, 26], iconAnchor: [13, 26] }); }
+    function truckIcon() { return L.divIcon({ className: "", html: '<div class="hy-truck"><svg viewBox="0 0 24 24"><path d="M12 3l7 17-7-4-7 4z"/></svg></div>', iconSize: [34, 34], iconAnchor: [17, 17] }); }
+    function openTrack(id) {
+      const s = data.shipments.find(x => x.id === id); if (!s) return;
+      if (typeof L === "undefined") return toast("الخريطة غير متاحة الآن. تأكد من الإنترنت.");
+      trk.id = id; trk.fitted = false; trk.route = null; trk.routeAt = 0;
+      document.getElementById("track-modal").classList.remove("hidden");
+      document.getElementById("track-title").textContent = "تتبع الرحلة " + id;
+      document.getElementById("track-sub").textContent = routeTextPlain(s);
+      document.getElementById("track-chat-btn").onclick = () => { closeTrack(); openChat(id); };
+      if (!trk.map) {
+        trk.map = L.map("track-map", { zoomControl: true }).setView([30.5, 31.2], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(trk.map);
+      }
+      setTimeout(() => { trk.map.invalidateSize(); refreshTrack(true); }, 80);
+      clearInterval(trk.timer); trk.timer = setInterval(() => refreshTrack(false), 5000);
+    }
+    function routeTextPlain(s) { return originName(s) + " ← " + destName(s); }
+    function closeTrack() { document.getElementById("track-modal").classList.add("hidden"); clearInterval(trk.timer); trk.id = null; }
+    async function refreshTrack(force) {
+      const id = trk.id; if (!id) return;
+      const s = data.shipments.find(x => x.id === id); if (!s) return;
+      const { o, d } = endpointsOf(s);
+      let loc = null;
+      if (s.driver_id) { const r = await sb.from("driver_locations").select("*").eq("shipment_id", id).maybeSingle(); if (!r.error && r.data) loc = r.data; }
+      if (id !== trk.id) return;
+      const me_ll = loc ? [loc.lat, loc.lng] : null;
+      trk.layers.forEach(l => trk.map.removeLayer(l)); trk.layers = [];
+      const add = l => { l.addTo(trk.map); trk.layers.push(l); return l; };
+      if (o) add(L.marker(o, { icon: pinIcon("A", "#16A34A") }));
+      if (d) add(L.marker(d, { icon: pinIcon("B", "#DC2626") }));
+      if (me_ll) add(L.marker(me_ll, { icon: truckIcon(), zIndexOffset: 1000 }));
+      // waypoints: السائق -> (نقطة التحميل لو لم يبدأ) -> الوجهة
+      const pts = []; if (me_ll) pts.push(me_ll); if (o && (!me_ll || s.status === "assigned")) pts.push(o); if (d) pts.push(d);
+      const key = pts.map(p => p.join(",")).join(";");
+      if (pts.length >= 2 && (force || !trk.route || (Date.now() - trk.routeAt > 45000) || trk.route.key !== key && Date.now() - trk.routeAt > 20000)) {
+        trk.routeAt = Date.now();
+        try {
+          const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 9000);
+          const u = "https://router.project-osrm.org/route/v1/driving/" + pts.map(p => p[1] + "," + p[0]).join(";") + "?overview=full&geometries=geojson";
+          const j = await (await fetch(u, { signal: ctl.signal })).json(); clearTimeout(tm);
+          if (j.code === "Ok" && j.routes[0]) trk.route = { key, line: j.routes[0].geometry.coordinates.map(c => [c[1], c[0]]), km: j.routes[0].distance / 1000, min: j.routes[0].duration / 60, real: true };
+          else throw new Error("route");
+        } catch (e) { trk.route = { key, line: pts, km: pts.slice(1).reduce((a, p, i) => a + hav(pts[i], p), 0) * 1.25, min: null, real: false }; }
+      }
+      if (trk.route && id === trk.id) {
+        const col = cssVar("--accent-1") || "#E2693A";
+        add(L.polyline(trk.route.line, { color: "#fff", weight: 9, opacity: .85 }));
+        add(L.polyline(trk.route.line, { color: col, weight: 5, opacity: 1, dashArray: trk.route.real ? null : "8 8" }));
+      }
+      if (!trk.fitted) { const all = [o, d, me_ll].filter(Boolean); if (all.length) { trk.map.fitBounds(L.latLngBounds(all), { padding: [40, 40] }); trk.fitted = true; } }
+      const info = document.getElementById("track-info"), note = document.getElementById("track-note");
+      const mine = me.id === s.driver_id;
+      let t = "";
+      if (trk.route) t = "المتبقي تقريباً: " + Math.round(trk.route.km) + " كم" + (trk.route.min ? " · " + (trk.route.min >= 60 ? Math.floor(trk.route.min / 60) + " س " + Math.round(trk.route.min % 60) + " د" : Math.round(trk.route.min) + " د") : "");
+      info.textContent = t;
+      let n = "";
+      if (s.status === "delivered") n = "تم التسليم.";
+      else if (s.status === "cancelled") n = "تم إلغاء الشحنة.";
+      else if (!s.driver_id) n = "بانتظار قبول سائق.";
+      else if (!loc) n = mine ? "جاري تحديد موقعك. فعّل الموقع وخلي الصفحة مفتوحة." : "السائق لسه ما شاركش موقعه. هيظهر هنا أول ما يفتح التطبيق.";
+      else { const ago = Math.max(0, Math.round((Date.now() - new Date(loc.updated_at).getTime()) / 1000)); n = ago < 30 ? "موقع السائق مباشر الآن." : ago < 600 ? "آخر موقع للسائق من " + Math.ceil(ago / 60) + " دقيقة." : "آخر موقع قديم. ممكن السائق قفل التطبيق."; }
+      if (trk.route && !trk.route.real) n += " (مسار تقريبي، تعذر تحميل مسار الطريق)";
+      note.textContent = n;
+      const nav = document.getElementById("track-nav");
+      if (mine && d) { nav.classList.remove("hidden"); const dst = (s.status === "assigned" && o) ? o : d; nav.href = "https://www.google.com/maps/dir/?api=1&destination=" + dst[0] + "," + dst[1] + "&travelmode=driving"; nav.textContent = s.status === "assigned" ? "ملاحة لنقطة التحميل (جوجل ماب)" : "ملاحة للوجهة (جوجل ماب)"; } else nav.classList.add("hidden");
+    }
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { hyMenu(false); if (!document.getElementById("track-modal").classList.contains("hidden")) closeTrack(); } });
+
     function showApp() {
       authError("");
       const authScr = document.getElementById("auth-screen");
@@ -1107,18 +1531,20 @@
       document.getElementById("app-footer").classList.remove("hidden");
       const isAdmin = me.role === "admin";
       document.getElementById("role-switcher").classList.toggle("hidden", !isAdmin);
+      document.getElementById("menu-profile").classList.toggle("hidden", me.role === "shipper");
       document.getElementById("user-chip").textContent = me.name + " · " + ROLE_LABEL[me.role];
       if (!mapReady) { mapReady = true; if (typeof L !== "undefined") initMap(); else document.getElementById("map").innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400">تعذر تحميل الخريطة. تحقق من الاتصال بالإنترنت.</div>'; }
       switchRole(isAdmin ? "admin" : me.role);
     }
     async function logout() {
-      clearInterval(pollTimer);
+      clearInterval(pollTimer); clearInterval(chatTimer); clearInterval(trk.timer); chatShip = null; trk.id = null;
+      ["chat-modal", "track-modal", "prof-modal"].forEach(i => document.getElementById(i).classList.add("hidden"));
       if (sb) await sb.auth.signOut();
-      me = null; data = { shipments: [], profiles: [], kycs: [], secrets: {} };
+      me = null; syncGps(); data = { shipments: [], profiles: [], kycs: [], secrets: {} };
       ["app-header", "app-main", "app-footer"].forEach(i => document.getElementById(i).classList.add("hidden"));
       const authScr2 = document.getElementById("auth-screen");
       authScr2.classList.remove("hidden"); authScr2.classList.remove("auth-enter"); void authScr2.offsetWidth; authScr2.classList.add("auth-enter");
-      document.getElementById("login-form").reset(); authTab("login");
+      document.getElementById("login-form").reset(); hyShowLogin("login");
     }
 
     async function init() {
