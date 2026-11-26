@@ -192,6 +192,8 @@
     .leaflet-popup-content-wrapper, .leaflet-popup-tip { background:var(--surface-solid); color:var(--text); border-radius:.8rem; font-family:inherit; }
     .hy-pin { border:2px solid #fff !important; }
     @media (max-width:640px) { html[data-theme] .overflow-x-auto td.p-3:not([data-label="المسار"]) { display:flex; justify-content:space-between; align-items:center; gap:.8rem; } html[data-theme] .overflow-x-auto td.p-3:not([data-label="المسار"])::before { margin:0; flex:0 0 auto; } }
+    .ic { width:1.1em; height:1.1em; display:inline-block; vertical-align:-.18em; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; margin-inline-end:.15rem; }
+    .text-2xl > .ic, span.text-2xl .ic { width:2rem; height:2rem; }
     .hy-grad-text { background:var(--accent-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
     .tabular-nums { font-variant-numeric: tabular-nums; }
@@ -334,8 +336,8 @@
             <label class="block text-xs font-bold text-slate-600 mb-1">مكان استلام البضاعة</label>
             <div class="grid grid-cols-3 gap-2 text-xs font-bold" id="pickup-modes">
               <button type="button" data-mode="preset" onclick="setPickupMode('preset')" class="pm-btn py-2 rounded-xl border">نقاط جاهزة</button>
-              <button type="button" data-mode="current" onclick="setPickupMode('current')" class="pm-btn py-2 rounded-xl border">📍 موقعي الحالي</button>
-              <button type="button" data-mode="map" onclick="setPickupMode('map')" class="pm-btn py-2 rounded-xl border">🗺️ من الخريطة</button>
+              <button type="button" data-mode="current" onclick="setPickupMode('current')" class="pm-btn py-2 rounded-xl border"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z'/><circle cx='12' cy='9.5' r='2.5'/></svg> موقعي الحالي</button>
+              <button type="button" data-mode="map" onclick="setPickupMode('map')" class="pm-btn py-2 rounded-xl border"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z'/><path d='M9 4v14M15 6v14'/></svg> من الخريطة</button>
             </div>
             <p id="pickup-hint" class="hidden mt-2 text-xs rounded-lg px-3 py-2"></p>
           </div>
@@ -402,7 +404,7 @@
               <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التسليم</label>
               <div class="grid grid-cols-2 gap-1 text-[11px] font-bold mb-1.5" id="dest-modes">
                 <button type="button" data-mode="preset" onclick="setDestMode('preset')" class="dm-btn py-1.5 rounded-lg border">نقاط جاهزة</button>
-                <button type="button" data-mode="map" onclick="setDestMode('map')" class="dm-btn py-1.5 rounded-lg border">🗺️ من الخريطة</button>
+                <button type="button" data-mode="map" onclick="setDestMode('map')" class="dm-btn py-1.5 rounded-lg border"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z'/><path d='M9 4v14M15 6v14'/></svg> من الخريطة</button>
               </div>
               <select id="destination" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
                 <optgroup label="دمياط">
@@ -736,9 +738,9 @@
           <datalist id="gov-list"><option value="القاهرة"><option value="الجيزة"><option value="الإسكندرية"><option value="القليوبية"><option value="الشرقية"><option value="الدقهلية"><option value="الغربية"><option value="المنوفية"><option value="البحيرة"><option value="الإسماعيلية"><option value="السويس"><option value="بورسعيد"><option value="الفيوم"><option value="بني سويف"><option value="المنيا"><option value="أسيوط"><option value="سوهاج"><option value="قنا"><option value="الأقصر"><option value="أسوان"></datalist>
           <input id="r-plate" placeholder="رقم لوحة السيارة (مثال: أ ب ج 4521)" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-400" />
           <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
-            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة البطاقة</span><img id="pv-id" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-id" class="block text-2xl text-slate-300">🪪</span><input id="r-idphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-id','ph-id')" /></label>
-            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة وجهك</span><img id="pv-face" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-face" class="block text-2xl text-slate-300">🙂</span><input id="r-facephoto" type="file" accept="image/*" capture="user" class="hidden" onchange="previewPhoto(this,'pv-face','ph-face')" /></label>
-            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة العربية</span><img id="pv-car" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-car" class="block text-2xl text-slate-300">🚚</span><input id="r-carphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-car','ph-car')" /></label>
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة البطاقة</span><img id="pv-id" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-id" class="block text-2xl text-slate-300"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><rect x='3' y='5' width='18' height='14' rx='2'/><circle cx='9' cy='11' r='2'/><path d='M6.5 16c.6-1.6 4.4-1.6 5 0M14 10h4M14 14h4'/></svg></span><input id="r-idphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-id','ph-id')" /></label>
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة وجهك</span><img id="pv-face" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-face" class="block text-2xl text-slate-300"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><circle cx='12' cy='12' r='9'/><circle cx='9' cy='10' r='.6'/><circle cx='15' cy='10' r='.6'/><path d='M8.5 14.5c1.9 2 5.1 2 7 0'/></svg></span><input id="r-facephoto" type="file" accept="image/*" capture="user" class="hidden" onchange="previewPhoto(this,'pv-face','ph-face')" /></label>
+            <label class="cursor-pointer border-2 border-dashed border-slate-300 rounded-xl p-2 hover:border-orange-400"><span class="block mb-1">صورة العربية</span><img id="pv-car" alt="" class="hidden w-full h-16 object-cover rounded-lg" /><span id="ph-car" class="block text-2xl text-slate-300"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M2 7h12v9H2zM14 10h4l3 3v3h-7'/><circle cx='7' cy='17' r='1.8'/><circle cx='17' cy='17' r='1.8'/></svg></span><input id="r-carphoto" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this,'pv-car','ph-car')" /></label>
           </div>
           <label class="flex items-start gap-2 text-xs text-slate-600"><input id="r-consent" type="checkbox" class="mt-0.5 accent-orange-500" /><span>أوافق على استخدام صورة بطاقتي ووجهي وسيارتي للتحقق من هويتي فقط، ومراجعتها من إدارة المنصة، وعلى <a href="privacy.html" target="_blank" class="underline">سياسة الخصوصية</a> و<a href="terms.html" target="_blank" class="underline">الشروط</a>.</span></label>
         </div>
@@ -1109,13 +1111,13 @@
       return out;
     }
     function pickupBadge(s) {
-      if (s.pickup_mode === "map") return '<span class="text-[11px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">🗺️ استلام من الخريطة (صورة إلزامية)</span>';
-      if (s.pickup_mode === "current") return '<span class="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">📍 من موقع العميل</span>';
+      if (s.pickup_mode === "map") return '<span class="text-[11px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg> استلام من الخريطة (صورة إلزامية)</span>';
+      if (s.pickup_mode === "current") return '<span class="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg> من موقع العميل</span>';
       return "";
     }
     const routeText = s => esc(originName(s)) + " ← " + esc(destName(s));
     const emptyBox = t => '<div class="anim-fade text-center text-sm text-slate-400 py-8 border border-dashed border-slate-200 rounded-xl">' + t + '</div>';
-    const stars = n => "★".repeat(n) + "☆".repeat(5 - n);
+    const stars = n => "★".repeat(n) + '<span style="opacity:.28">' + "★".repeat(5 - n) + "</span>";
 
     function goodsBlockShipper(s) {
       if (s.pickup_mode !== "map" || s.status === "cancelled") return "";
@@ -1124,14 +1126,14 @@
           '<img data-goods="' + esc(s.goods_photo_path) + '" alt="صورة البضاعة" onclick="viewImage(this.src,\'صورة البضاعة\')" class="w-full max-h-48 object-cover rounded-lg cursor-zoom-in bg-slate-100" />' +
           '<div class="flex gap-2"><button onclick="reviewGoods(\'' + esc(s.id) + '\', true)" class="flex-1 py-2 rounded-lg bg-emerald-600 text-white text-xs font-extrabold">البضاعة سليمة، أؤكد</button>' +
           '<button onclick="reviewGoods(\'' + esc(s.id) + '\', false)" class="flex-1 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 text-xs font-extrabold">ارفض واطلب صورة جديدة</button></div></div>';
-      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">✅ أكدت صورة البضاعة</div>';
+      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/></svg> أكدت صورة البضاعة</div>';
       if (s.goods_status === "rejected") return '<div class="text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2">رفضت الصورة السابقة. بانتظار صورة جديدة من السائق.</div>';
       if (s.status === "delivered") return "";
       return '<div class="text-xs text-purple-800 bg-purple-50 rounded-lg px-3 py-2">الاستلام من نقطة على الخريطة: السائق لازم يرسل لك صورة البضاعة وتأكدها قبل التحميل.</div>';
     }
     function goodsBlockDriver(s) {
       if (s.pickup_mode !== "map") return "";
-      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">✅ العميل أكد البضاعة</div>';
+      if (s.goods_status === "approved") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/></svg> العميل أكد البضاعة</div>';
       if (s.goods_status === "pending") return '<div class="text-xs font-bold text-amber-700 bg-amber-50 rounded-lg px-3 py-2">تم إرسال الصورة. بانتظار تأكيد العميل...</div>';
       return (s.goods_status === "rejected" ? '<div class="text-xs font-bold text-red-700 bg-red-50 rounded-lg px-3 py-2">العميل رفض الصورة. صوّر البضاعة مرة أخرى بوضوح.</div>' : '') +
         '<div class="space-y-2"><p class="text-xs text-slate-600">الطلب من نقطة على الخريطة: أرسل للعميل صورة للبضاعة لتأكيدها قبل بدء الرحلة.</p>' +
@@ -1165,9 +1167,9 @@
       if (me.role !== "driver") { el.classList.add("hidden"); t.textContent = "حالة السائق"; return; }
       t.textContent = "حالة السائق (" + driverLabel(me.id) + ")";
       const k = kycOf(me.id), st = k ? k.status : "missing";
-      const m = { approved: ["bg-emerald-50 text-emerald-800 border border-emerald-200", "✅ تم اعتماد وثائقك. تقدر تقبل الرحلات."],
-        pending: ["bg-amber-50 text-amber-800 border border-amber-200", "⏳ وثائقك قيد المراجعة من الإدارة. هتقدر تقبل رحلات بعد الاعتماد."],
-        rejected: ["bg-red-50 text-red-700 border border-red-200", "❌ تم رفض وثائقك. تواصل مع الإدارة."],
+      const m = { approved: ["bg-emerald-50 text-emerald-800 border border-emerald-200", "تم اعتماد وثائقك. تقدر تقبل الرحلات."],
+        pending: ["bg-amber-50 text-amber-800 border border-amber-200", "وثائقك قيد المراجعة من الإدارة. هتقدر تقبل رحلات بعد الاعتماد."],
+        rejected: ["bg-red-50 text-red-700 border border-red-200", "تم رفض وثائقك. تواصل مع الإدارة."],
         missing: ["bg-red-50 text-red-700 border border-red-200", "لا توجد وثائق على حسابك. تواصل مع الإدارة."] }[st];
       el.className = "rounded-2xl p-4 text-sm font-semibold " + m[0]; el.textContent = m[1];
     }
@@ -1184,7 +1186,7 @@
       const done = data.shipments.filter(s => s.driver_id === me.id && s.status === "delivered");
       const rated = done.filter(s => s.rating);
       document.getElementById("driver-wallet").innerText = fmt(done.reduce((a, s) => a + (s.earning || 0), 0));
-      document.getElementById("driver-trips-count").innerText = done.length + " رحلة" + (rated.length ? " · ⭐ " + (rated.reduce((a, s) => a + s.rating, 0) / rated.length).toFixed(1) : "");
+      document.getElementById("driver-trips-count").innerText = done.length + " رحلة" + (rated.length ? " · ★ " + (rated.reduce((a, s) => a + s.rating, 0) / rated.length).toFixed(1) : "");
 
       const avail = document.getElementById("driver-available-list");
       const open = data.shipments.filter(s => s.status === "requested");
@@ -1444,7 +1446,7 @@
       document.getElementById("prof-modal").classList.remove("hidden");
       const [pr, st] = await Promise.all([sb.from("driver_profiles").select("*").eq("driver_id", driverId).maybeSingle(), sb.rpc("driver_stats", { p_driver: driverId })]);
       const d = pr.data || {}, t = st.data || {};
-      const stats = '<div class="grid grid-cols-3 gap-2 text-center"><div class="hy-card"><p class="text-lg font-extrabold">' + (t.trips || 0) + '</p><p class="text-xs" style="color:var(--text-muted)">رحلة منفذة</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (t.rating ? "⭐ " + t.rating : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">التقييم</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (d.years != null ? d.years : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">سنوات الخبرة</p></div></div>';
+      const stats = '<div class="grid grid-cols-3 gap-2 text-center"><div class="hy-card"><p class="text-lg font-extrabold">' + (t.trips || 0) + '</p><p class="text-xs" style="color:var(--text-muted)">رحلة منفذة</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (t.rating ? "★ " + t.rating : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">التقييم</p></div><div class="hy-card"><p class="text-lg font-extrabold">' + (d.years != null ? d.years : "-") + '</p><p class="text-xs" style="color:var(--text-muted)">سنوات الخبرة</p></div></div>';
       const rows = profRow("نبذة عن السائق", d.bio) + profRow("مناطق العمل", d.areas) + profRow("عن السيارة", d.vehicle_note);
       body.innerHTML = stats + (rows || '<div class="hy-card text-sm" style="color:var(--text-muted)">لم يكتب السائق نبذة بعد.</div>');
     }
