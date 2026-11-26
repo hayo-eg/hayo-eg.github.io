@@ -2,10 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="description" content="شحنتك: منصة نقل البضائع والأساطيل عند الطلب في مصر، تسعير فوري وتتبع وتسليم برمز OTP." />
+  <meta name="description" content="هايو: منصة نقل البضائع والأساطيل عند الطلب في مصر، تسعير فوري وتتبع وتسليم برمز OTP." />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>شحنتك | منصة النقل واللوجستيات الذكية عند الطلب</title>
+  <title>هايو (Hayo) | منصة النقل واللوجستيات الذكية عند الطلب</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -83,9 +86,9 @@
   <header id="app-header" class="hidden sticky top-0 z-50 bg-slate-900 text-white shadow-lg no-print">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center font-extrabold text-xl shadow">ش</div>
+        <img src="assets/hayo-icon-192.png" alt="Hayo" class="w-10 h-10 rounded-xl shadow" />
         <div>
-          <h1 class="font-extrabold text-lg leading-tight">شحنتك <span class="text-orange-400 text-xs font-semibold">LogTech</span></h1>
+          <h1 class="font-extrabold text-lg leading-tight">هايو <span class="text-orange-400 text-xs font-semibold">LogTech</span></h1>
           <p class="text-xs text-slate-400">منصة نقل البضائع والأساطيل عند الطلب</p>
         </div>
       </div>
@@ -442,8 +445,8 @@
   <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-600">
     <div class="anim-card w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
       <div class="text-center mb-6">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-orange-500 text-white flex items-center justify-center font-extrabold text-2xl shadow">ش</div>
-        <h2 class="mt-3 text-2xl font-extrabold">شحنتك</h2>
+        <img src="assets/hayo-logo.png" alt="Hayo هايو" class="mx-auto h-24 w-auto" />
+        <h2 class="sr-only">هايو</h2>
         <p class="text-sm text-slate-500">منصة النقل واللوجستيات الذكية عند الطلب</p>
       </div>
       <div class="flex bg-slate-100 p-1 rounded-xl mb-5 text-sm font-bold">
@@ -738,14 +741,44 @@
     function cancelShipment(id) { if (confirm("إلغاء هذه الشحنة؟")) rpc("cancel_shipment", { p_id: id }, "تم إلغاء الشحنة."); }
     const rateShipment = (id, n) => rpc("rate_shipment", { p_id: id, p_stars: n }, "شكرًا على تقييمك.");
     const reviewGoods = (id, ok) => rpc("review_goods", { p_id: id, p_ok: ok }, ok ? "تم تأكيد البضاعة. يقدر السائق يبدأ الرحلة." : "تم رفض الصورة. هيتطلب من السائق صورة جديدة.");
+    function gpMsg(id, text, ok) {
+      const el = document.getElementById("gpmsg-" + id); if (!el) return;
+      el.textContent = text || ""; el.className = "text-xs font-bold rounded-lg px-3 py-2 " + (text ? (ok ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-700") : "hidden");
+    }
+    function withTimeout(p, ms) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]); }
     async function submitGoodsPhoto(id) {
-      const inp = document.getElementById("gp-" + id);
-      if (!inp || !inp.files[0]) return toast("صوّر البضاعة أولاً.");
-      let img; try { img = await readImage(inp.files[0], 900); } catch (e) { return toast("تعذر قراءة الصورة. جرّب صورة أخرى."); }
-      const path = id + "/" + Date.now() + ".jpg";
-      const up = await sb.storage.from("goods").upload(path, img.blob, { contentType: "image/jpeg" });
-      if (up.error) return toast("تعذر رفع الصورة: " + errMsg(up.error));
-      await rpc("driver_submit_goods", { p_id: id, p_path: path }, "تم إرسال صورة البضاعة للعميل. بانتظار تأكيده.");
+      const inp = document.getElementById("gp-" + id), btn = document.getElementById("gpbtn-" + id);
+      if (!inp || !inp.files[0]) return gpMsg(id, "اختار صورة البضاعة أولاً.");
+      const file = inp.files[0];
+      if (btn) { btn.disabled = true; btn.textContent = "جاري الإرسال..."; }
+      const fail = m => { gpMsg(id, "لم يتم إرسال الصورة: " + m + " اضغط إرسال مرة أخرى."); toast("لم يتم إرسال الصورة"); if (btn) { btn.disabled = false; btn.textContent = "إرسال للعميل"; } };
+      try {
+        gpMsg(id, "جاري تجهيز الصورة...", true);
+        let blob;
+        try { blob = (await readImage(file, 900)).blob; }
+        catch (e) {
+          if (/^image\/(jpeg|png|webp)$/.test(file.type) && file.size <= 3 * 1024 * 1024) blob = file;
+          else return fail("صيغة الصورة غير مدعومة (استخدم JPG أو PNG).");
+        }
+        if (blob.size > 3 * 1024 * 1024) return fail("حجم الصورة كبير.");
+        const path = id + "/" + Date.now() + ".jpg";
+        let lastErr = null;
+        for (let i = 0; i < 3; i++) {
+          gpMsg(id, "جاري رفع الصورة" + (i ? " (محاولة " + (i + 1) + ")" : "") + "...", true);
+          try {
+            const up = await withTimeout(sb.storage.from("goods").upload(path, blob, { contentType: blob.type || "image/jpeg", upsert: true }), 40000);
+            if (!up.error) { lastErr = null; break; }
+            lastErr = up.error;
+          } catch (e) { lastErr = e; }
+          await new Promise(r => setTimeout(r, 1500));
+        }
+        if (lastErr) return fail("تأكد من الإنترنت.");
+        gpMsg(id, "جاري إرسالها للعميل...", true);
+        const r = await withTimeout(sb.rpc("driver_submit_goods", { p_id: id, p_path: path }), 30000).catch(e => ({ error: e }));
+        if (r.error) return fail(errMsg(r.error) + ".");
+        toast("تم إرسال صورة البضاعة للعميل. بانتظار تأكيده.");
+        await refreshAndRender(false);
+      } catch (e) { fail("حدث خطأ غير متوقع."); }
     }
     function toggleDriverOnline() { driverOnline = !driverOnline; renderAll(); }
 
@@ -814,7 +847,7 @@
       return (s.goods_status === "rejected" ? '<div class="text-xs font-bold text-red-700 bg-red-50 rounded-lg px-3 py-2">العميل رفض الصورة. صوّر البضاعة مرة أخرى بوضوح.</div>' : '') +
         '<div class="space-y-2"><p class="text-xs text-slate-600">الطلب من نقطة على الخريطة: أرسل للعميل صورة للبضاعة لتأكيدها قبل بدء الرحلة.</p>' +
         '<div class="flex gap-2"><input id="gp-' + esc(s.id) + '" type="file" accept="image/*" capture="environment" class="flex-1 text-xs border border-slate-300 rounded-xl p-1.5" />' +
-        '<button onclick="submitGoodsPhoto(\'' + esc(s.id) + '\')" class="px-3 rounded-xl bg-slate-900 text-white text-xs font-extrabold">إرسال للعميل</button></div></div>';
+        '<button id="gpbtn-' + esc(s.id) + '" onclick="submitGoodsPhoto(\'' + esc(s.id) + '\')" class="px-3 rounded-xl bg-slate-900 text-white text-xs font-extrabold disabled:opacity-60">إرسال للعميل</button></div><div id="gpmsg-' + esc(s.id) + '" class="hidden"></div></div>';
     }
 
     function renderShipperList() {
