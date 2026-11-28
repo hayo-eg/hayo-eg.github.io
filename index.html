@@ -27,7 +27,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>هايو (Hayo) | حجز شاحنات ونقل بضائع في مصر - منصة شحن عند الطلب</title>
   <script>
-const HY_BUILD="20261126-4";
+const HY_BUILD="20261128-1";
 (function(){
   let busy=false;
   async function chk(){ if(busy||!/^https?:/.test(location.protocol))return; busy=true;
@@ -281,7 +281,31 @@ const HY_BUILD="20261126-4";
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
-  </style>
+  
+    /* ===== نموذج الطلب المبسط (خطوات) ===== */
+    .wz-bar{display:flex;gap:6px;align-items:center}
+    .wz-dot{flex:1;height:4px;border-radius:99px;background:color-mix(in srgb,var(--text-muted) 25%,transparent);transition:background .25s}
+    .wz-dot.on{background:var(--accent-1)}
+    .wz-title{font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:.4rem}
+    .wz-sub{font-size:.72rem;color:var(--text-muted)}
+    .wz-step{display:none;flex-direction:column;gap:.85rem}
+    .wz-step.on{display:flex;animation:wzin .25s ease both}
+    @keyframes wzin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .wz-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+    .wz-opt{border:1.5px solid color-mix(in srgb,var(--text-muted) 30%,transparent);border-radius:.8rem;padding:.55rem .2rem;font-size:.68rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:.25rem;line-height:1.2;text-align:center;background:transparent;color:var(--text);cursor:pointer;transition:border-color .2s,background .2s}
+    .wz-opt .ic{width:1.35rem;height:1.35rem}
+    .wz-opt.on{border-color:var(--accent-1);background:color-mix(in srgb,var(--accent-1) 14%,transparent)}
+    .wz-pay{display:flex;gap:.6rem;align-items:flex-start;text-align:right;width:100%;border:1.5px solid color-mix(in srgb,var(--text-muted) 30%,transparent);border-radius:.9rem;padding:.7rem .8rem;background:transparent;color:var(--text);cursor:pointer;transition:border-color .2s,background .2s}
+    .wz-pay.on{border-color:var(--accent-1);background:color-mix(in srgb,var(--accent-1) 12%,transparent)}
+    .wz-pay .ic{width:1.3rem;height:1.3rem;flex:none;margin-top:.1rem}
+    .wz-pay b{display:block;font-size:.82rem}.wz-pay span.d{display:block;font-size:.7rem;color:var(--text-muted);margin-top:.1rem}
+    .wz-step-btn{width:2.4rem;height:2.4rem;border-radius:.7rem;border:1.5px solid color-mix(in srgb,var(--text-muted) 30%,transparent);font-weight:800;font-size:1.1rem;background:transparent;color:var(--text)}
+    .wz-nav{display:flex;gap:.5rem}
+    .wz-back{padding:.8rem 1rem;border-radius:.8rem;border:1.5px solid color-mix(in srgb,var(--text-muted) 30%,transparent);font-weight:800;font-size:.8rem;background:transparent;color:var(--text)}
+    .wz-small{font-size:.72rem;font-weight:700;color:var(--text-muted);margin-bottom:.25rem;display:flex;align-items:center;gap:.3rem}
+    .wz-small .ic{width:.95rem;height:.95rem}
+    .cm-box{border:1.5px dashed color-mix(in srgb,var(--accent-1) 55%,transparent);border-radius:.9rem;padding:.75rem;display:flex;flex-direction:column;gap:.5rem}
+</style>
 </head>
 <body class="text-slate-900">
 
@@ -358,8 +382,11 @@ const HY_BUILD="20261126-4";
             <span class="hy-chip text-xs font-bold px-2.5 py-1 rounded-full">تسعير ديناميكي فوري</span>
           </div>
 
+          <div class="wz-bar" id="wz-bar"><span class="wz-dot on"></span><span class="wz-dot"></span><span class="wz-dot"></span></div>
+          <div class="wz-step on" id="wz1">
+          <div class="wz-title"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z'/><circle cx='12' cy='9.5' r='2.5'/></svg> من وإلى</div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">مكان استلام البضاعة</label>
+            <label class="wz-small">مكان استلام البضاعة</label>
             <div class="grid grid-cols-3 gap-2 text-xs font-bold" id="pickup-modes">
               <button type="button" data-mode="preset" onclick="setPickupMode('preset')" class="pm-btn py-2 rounded-xl border">نقاط جاهزة</button>
               <button type="button" data-mode="current" onclick="setPickupMode('current')" class="pm-btn py-2 rounded-xl border"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z'/><circle cx='12' cy='9.5' r='2.5'/></svg> موقعي الحالي</button>
@@ -368,7 +395,7 @@ const HY_BUILD="20261126-4";
             <p id="pickup-hint" class="hidden mt-2 text-xs rounded-lg px-3 py-2"></p>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 gap-3">
             <div id="origin-wrap">
               <label class="block text-xs font-bold text-slate-600 mb-1">نقطة التحميل</label>
               <select id="origin" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
@@ -491,45 +518,51 @@ const HY_BUILD="20261126-4";
 
           <p id="dest-hint" class="hidden -mt-1 text-xs rounded-lg px-3 py-2"></p>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">نوع الشاحنة</label>
-              <select id="truckType" onchange="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+          <div class="wz-nav"><button type="button" class="flex-1 py-3 rounded-xl bg-orange-500 text-white font-extrabold text-sm" onclick="nextStep(2)">التالي ←</button></div>
+          </div>
+          <div class="wz-step" id="wz2">
+          <div class="wz-title"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M21 8 12 3 3 8v8l9 5 9-5z'/><path d='m3 8 9 5 9-5M12 13v8'/></svg> الشحنة</div>
+          <div>
+            <label class="wz-small">نوع الشاحنة</label>
+            <div class="wz-opts" id="truck-opts"><button type="button" class="wz-opt" data-t="quarter" onclick="setTruck('quarter')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M2 16V8h10v8M12 11h5l3 3v2H2'/><circle cx='7' cy='17' r='1.6'/><circle cx='17' cy='17' r='1.6'/></svg><span>ربع نقل</span></button><button type="button" class="wz-opt on" data-t="jumbo" onclick="setTruck('jumbo')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M1 16V7h12v9M13 10h5l4 4v2H1'/><circle cx='6' cy='17' r='1.7'/><circle cx='18' cy='17' r='1.7'/></svg><span>جامبو</span></button><button type="button" class="wz-opt" data-t="trailer" onclick="setTruck('trailer')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M1 15V6h14v9M15 10h3l4 3v2H1'/><circle cx='5' cy='17' r='1.6'/><circle cx='11' cy='17' r='1.6'/><circle cx='19' cy='17' r='1.6'/></svg><span>تريلا</span></button><button type="button" class="wz-opt" data-t="reefer" onclick="setTruck('reefer')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><path d='M1 16V7h12v9M13 10h5l4 4v2H1'/><path d='M7 9.5v4M5.3 10.5l3.4 2M8.7 10.5l-3.4 2'/><circle cx='18' cy='17' r='1.7'/></svg><span>ثلاجة</span></button></div>
+            <select id="truckType" onchange="updateMapAndPrice();syncTruck()" class="hidden">
                 <option value="quarter">ربع نقل (حتى 1.5 طن)</option>
                 <option value="jumbo" selected>جامبو (حتى 4.5 طن)</option>
                 <option value="trailer">تريلا / مقطورة (حتى 25 طن)</option>
                 <option value="reefer">ثلاجة مبردة (حتى 5 طن)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">الوزن التقريبي (طن)</label>
-              <input type="number" id="weight" value="3.5" min="0.5" max="30" step="0.5" oninput="updateMapAndPrice()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-bold tabular-nums" />
+            </select>
+            <p id="truck-cap" class="wz-sub mt-1">جامبو: حتى 4.5 طن</p>
+          </div>
+          <div>
+            <label class="wz-small">الوزن التقريبي (طن)</label>
+            <div class="flex items-center gap-2">
+              <button type="button" class="wz-step-btn" onclick="bumpWeight(-0.5)" aria-label="أقل">−</button>
+              <input type="number" id="weight" value="3.5" min="0.5" max="30" step="0.5" oninput="updateMapAndPrice()" class="flex-1 min-w-0 text-center border border-slate-300 rounded-xl p-2 text-sm bg-slate-50 font-bold tabular-nums" />
+              <button type="button" class="wz-step-btn" onclick="bumpWeight(0.5)" aria-label="أكثر">+</button>
             </div>
           </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">نوع البضاعة</label>
-              <input type="text" id="cargoDesc" value="مواد غذائية معبأة" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">طريقة الدفع (يُتفق عليها مع المنصة)</label>
-              <select id="paymentMethod" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 font-semibold">
+          <div>
+            <label class="wz-small">نوع البضاعة</label>
+            <input type="text" id="cargoDesc" value="مواد غذائية معبأة" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50" />
+          </div>
+          <label class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer border border-emerald-200 bg-emerald-50">
+            <input type="checkbox" id="backhaul" checked onchange="updateMapAndPrice()" class="w-4 h-4 accent-emerald-600" />
+            <span class="text-xs"><b class="text-emerald-800">خصم 15%</b> <span class="text-emerald-700">لو المسار مرن وممكن شاحنة عائدة تاخده</span></span>
+          </label>
+          <div class="wz-nav"><button type="button" class="wz-back" onclick="goStep(1)">رجوع</button><button type="button" class="flex-1 py-3 rounded-xl bg-orange-500 text-white font-extrabold text-sm" onclick="nextStep(3)">التالي ←</button></div>
+          </div>
+          <div class="wz-step" id="wz3">
+          <div class="wz-title"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><rect x='2' y='6' width='20' height='13' rx='2'/><path d='M2 10h20M6 15h4'/></svg> الدفع</div>
+          <div class="space-y-2">
+            <button type="button" id="pay-cash" class="wz-pay" onclick="setPay('cash')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><rect x='2' y='7' width='20' height='11' rx='2'/><circle cx='12' cy='12.5' r='2.5'/></svg><div><b>كاش للسائق</b><span class="d">تدفع للسائق نقداً، وتحوّل عمولة المنصة (<span class="cm-pct">10</span>%) أونلاين، وطلبك يظهر للسائقين بعد تأكيدها.</span></div></button>
+            <button type="button" id="pay-online" class="wz-pay on" onclick="setPay('online')"><svg class='ic' viewBox='0 0 24 24' aria-hidden='true'><rect x='2' y='5' width='20' height='14' rx='2'/><path d='M2 10h20'/></svg><div><b>دفع إلكتروني</b><span class="d">يتفق عليه مع المنصة</span></div></button>
+            <select id="paymentMethod" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-slate-50 font-semibold">
                 <option value="محفظة إلكترونية / انستاباي">انستاباي / فودافون كاش</option>
                 <option value="حساب شركات آجل">حساب شركات (ضمان بنكي)</option>
                 <option value="بطاقة بنكية">بطاقة ائتمان / ميزة</option>
-              </select>
-            </div>
+            </select>
+            <p id="cash-note" class="hidden text-xs font-bold rounded-xl px-3 py-2" style="background:color-mix(in srgb,var(--accent-1) 14%,transparent)"></p>
           </div>
-
-          <label class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 p-3 rounded-xl cursor-pointer">
-            <input type="checkbox" id="backhaul" checked onchange="updateMapAndPrice()" class="w-4 h-4 accent-emerald-600" />
-            <div class="text-xs">
-              <span class="font-extrabold text-emerald-800 block">خصم خط العودة (Backhaul -15%)</span>
-              <span class="text-emerald-700">خصم 15% لو المسار مرن وممكن شاحنة عائدة تاخده</span>
-            </div>
-          </label>
-
           <!-- Fare Breakdown -->
           <div class="hy-panel bg-slate-900 text-white rounded-2xl p-4 space-y-2">
             <div class="flex justify-between text-xs text-slate-400">
@@ -542,9 +575,10 @@ const HY_BUILD="20261126-4";
             </div>
           </div>
 
-          <button id="create-ship-btn" onclick="createShipment()" class="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm shadow-lg shadow-orange-500/20 transition">
-            تأكيد وحجز الشاحنة الآن ←
-          </button>
+          <div class="wz-nav"><button type="button" class="wz-back" onclick="goStep(2)">رجوع</button>          <button id="create-ship-btn" onclick="createShipment()" class="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm shadow-lg shadow-orange-500/20 transition">
+            تأكيد الطلب ←
+          </button></div>
+          </div>
         </div>
 
         <!-- Map & Active Shipments -->
@@ -618,6 +652,20 @@ const HY_BUILD="20261126-4";
           <p class="text-xs text-slate-500 font-bold">صافي عمولة المنصة (12%)</p>
           <p id="kpi-rev" class="text-2xl font-extrabold text-slate-900 tabular-nums mt-1">0 ج.م</p>
         </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3" id="admin-cm-card">
+        <div class="flex items-center justify-between"><h3 class="font-extrabold">عمولات الكاش بانتظار التأكيد</h3><span id="cm-count" class="text-xs font-bold" style="color:var(--text-muted)"></span></div>
+        <div id="admin-commission" class="space-y-2"></div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3" id="admin-settings">
+        <h3 class="font-extrabold">إعدادات الدفع الكاش</h3>
+        <form class="grid grid-cols-1 sm:grid-cols-3 gap-2" onsubmit="return saveSettings(event)">
+          <label class="text-xs font-bold">نسبة عمولة المنصة (%)<input id="st-pct" type="number" min="0" max="50" step="1" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" /></label>
+          <label class="text-xs font-bold">رقم إنستا باي<input id="st-insta" dir="ltr" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" /></label>
+          <label class="text-xs font-bold">رقم فودافون كاش<input id="st-voda" dir="ltr" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" /></label>
+          <button class="sm:col-span-3 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm">حفظ الإعدادات</button>
+        </form>
       </div>
 
       <div class="bg-white rounded-2xl border border-slate-200 p-5 overflow-x-auto">
@@ -851,6 +899,7 @@ const HY_BUILD="20261126-4";
     };
 
     const STATUS_MAP = {
+      pending_payment: { label: "بانتظار تأكيد العمولة", color: "bg-orange-100 text-orange-800" },
       requested: { label: "بانتظار سائق", color: "bg-amber-100 text-amber-800" },
       assigned: { label: "تم تعيين السائق", color: "bg-blue-100 text-blue-800" },
       in_transit: { label: "في الطريق للتسليم", color: "bg-purple-100 text-purple-800" },
@@ -953,18 +1002,20 @@ const HY_BUILD="20261126-4";
     /* ---------- تحميل البيانات (RLS بتفلتر حسب الدور) ---------- */
     async function loadData() {
       if (!me) return;
-      const [sh, pr, kc, sc, cm] = await Promise.all([
+      const [sh, pr, kc, sc, cm, st] = await Promise.all([
         sb.from("shipments").select("*").order("created_at", { ascending: false }).limit(500),
         sb.from("profiles").select("*"),
         sb.from("driver_kyc").select("*"),
         sb.from("shipment_secrets").select("*"),
-        sb.from("messages").select("id,shipment_id,sender_id").order("id", { ascending: false }).limit(400)
+        sb.from("messages").select("id,shipment_id,sender_id").order("id", { ascending: false }).limit(400),
+        sb.from("app_settings").select("*")
       ]);
       const bad = [sh, pr, kc, sc].find(r => r.error);
       if (bad) { toast("تعذر تحميل البيانات: " + errMsg(bad.error)); return; }
       data.shipments = sh.data; data.profiles = pr.data; data.kycs = kc.data;
       data.secrets = {}; sc.data.forEach(x => data.secrets[x.shipment_id] = x.otp);
       data.chatMeta = {}; if (!cm.error) cm.data.forEach(m => (data.chatMeta[m.shipment_id] = data.chatMeta[m.shipment_id] || []).push(m));
+      data.settings = data.settings || {}; if (!st.error && st.data) st.data.forEach(x => data.settings[x.key] = x.value);
       const mine = data.profiles.find(p => p.id === me.id); if (mine) me = mine;
     }
     async function refreshAndRender(manual) {
@@ -977,7 +1028,7 @@ const HY_BUILD="20261126-4";
       clearInterval(pollTimer);
       pollTimer = setInterval(() => {
         const a = document.activeElement;
-        if (a && a.matches && a.matches("#driver-active-list input, #admin-search, input[type=file]")) return;
+        if (a && a.matches && a.matches("#driver-active-list input, #admin-search, #shipper-list input, #admin-settings input, input[type=file]")) return;
         refreshAndRender(false);
       }, 20000);
     }
@@ -1019,13 +1070,14 @@ const HY_BUILD="20261126-4";
         truck_key: document.getElementById("truckType").value,
         weight: Math.min(30, Math.max(0.5, parseFloat(document.getElementById("weight").value) || 1)),
         cargo: document.getElementById("cargoDesc").value.trim().slice(0, 120) || "بضائع عامة",
-        payment: document.getElementById("paymentMethod").value,
+        payment: payMode === "cash" ? "cash" : document.getElementById("paymentMethod").value,
         backhaul: document.getElementById("backhaul").checked
       };
       const { data: s, error } = await sb.from("shipments").insert(row).select().single();
       if (error) return toast(errMsg(error));
+      goStep(1);
       await refreshAndRender(false);
-      toast("تم إنشاء الشحنة " + s.id + " بسعر " + fmt(s.price) + " ج.م." + (s.pickup_mode === "map" ? " سيرسل لك السائق صورة البضاعة للتأكيد." : ""));
+      toast(s.status === "pending_payment" ? "تم إنشاء الشحنة " + s.id + ". حوّل عمولة المنصة (" + fmt(s.commission_amount) + " ج.م) وارفع صورة التحويل ليظهر طلبك للسائقين." : "تم إنشاء الشحنة " + s.id + " بسعر " + fmt(s.price) + " ج.م." + (s.pickup_mode === "map" ? " سيرسل لك السائق صورة البضاعة للتأكيد." : ""));
       } finally { if (cbtn) { cbtn.disabled = false; cbtn.classList.remove("is-loading"); } }
     }
     const acceptShipment = id => { if (!driverOnline) return toast("يرجى تفعيل وضع (متصل) أولاً لاستقبال الطلبات."); return rpc("accept_shipment", { p_id: id }, "تم قبول الشحنة " + id + ". توجه لنقطة التحميل."); };
@@ -1077,6 +1129,132 @@ const HY_BUILD="20261126-4";
         toast("تم إرسال صورة البضاعة للعميل. بانتظار تأكيده.");
         await refreshAndRender(false);
       } catch (e) { fail("حدث خطأ غير متوقع."); }
+    }
+
+    /* ===== نموذج الطلب: خطوات + دفع كاش بعمولة ===== */
+    let payMode = "online", wzStep = 1;
+    const TRUCK_CAP = { quarter: "ربع نقل: حتى 1.5 طن", jumbo: "جامبو: حتى 4.5 طن", trailer: "تريلا: حتى 25 طن", reefer: "ثلاجة مبردة: حتى 5 طن" };
+    function goStep(n) {
+      wzStep = n;
+      [1, 2, 3].forEach(i => document.getElementById("wz" + i).classList.toggle("on", i === n));
+      document.querySelectorAll("#wz-bar .wz-dot").forEach((d, i) => d.classList.toggle("on", i < n));
+      if (n === 3) { updateCashNote(); }
+      if (map) setTimeout(() => map.invalidateSize(), 60);
+    }
+    function nextStep(n) {
+      if (n === 2) {
+        const dKey = dest.mode === "map" ? "custom" : document.getElementById("destination").value;
+        const oKey = pickup.mode === "preset" ? document.getElementById("origin").value : "custom";
+        if (oKey === "custom" && !pickup.coords) return toast(pickup.mode === "current" ? "حدد موقعك الحالي أولاً." : "اضغط على الخريطة لتحديد مكان الاستلام.");
+        if (dKey === "custom" && !dest.coords) return toast("اضغط على الخريطة لتحديد مكان التسليم.");
+        if (oKey !== "custom" && oKey === dKey) return toast("اختر نقطة تسليم مختلفة عن التحميل.");
+      }
+      goStep(n);
+    }
+    function syncTruck() {
+      const k = document.getElementById("truckType").value;
+      document.querySelectorAll("#truck-opts .wz-opt").forEach(b => b.classList.toggle("on", b.dataset.t === k));
+      const c = document.getElementById("truck-cap"); if (c) c.textContent = TRUCK_CAP[k] || "";
+    }
+    function setTruck(k) { document.getElementById("truckType").value = k; syncTruck(); updateMapAndPrice(); }
+    function bumpWeight(d) {
+      const w = document.getElementById("weight");
+      w.value = Math.min(30, Math.max(0.5, (parseFloat(w.value) || 1) + d));
+      updateMapAndPrice();
+    }
+    const cmPct = () => { const v = parseInt((data.settings || {}).commission_pct, 10); return isNaN(v) ? 10 : v; };
+    function setPay(m) {
+      payMode = m;
+      document.getElementById("pay-cash").classList.toggle("on", m === "cash");
+      document.getElementById("pay-online").classList.toggle("on", m === "online");
+      document.getElementById("paymentMethod").classList.toggle("hidden", m === "cash");
+      updateCashNote();
+    }
+    function updateCashNote() {
+      document.querySelectorAll(".cm-pct").forEach(e => e.textContent = cmPct());
+      const n = document.getElementById("cash-note"); if (!n) return;
+      if (payMode !== "cash") { n.classList.add("hidden"); return; }
+      const price = parseInt((document.getElementById("calc-price").textContent || "").replace(/[^0-9]/g, ""), 10) || 0;
+      n.classList.remove("hidden");
+      n.textContent = price ? "عمولة المنصة: " + fmt(Math.round(price * cmPct() / 100)) + " ج.م (" + cmPct() + "% من " + fmt(price) + "). تحوّلها بعد تأكيد الطلب." : "عمولة المنصة: " + cmPct() + "% من قيمة الرحلة.";
+    }
+    const _ump = updateMapAndPrice;
+    updateMapAndPrice = function () { const r = _ump.apply(this, arguments); try { updateCashNote(); } catch (e) {} return r; };
+
+    function commissionBlockShipper(s) {
+      const id = esc(s.id), amt = fmt(s.commission_amount) + " ج.م";
+      if (s.commission_status === "confirmed") return '<div class="text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">تم تأكيد عمولة المنصة (' + amt + ')</div>';
+      if (s.status !== "pending_payment") return "";
+      if (s.commission_status === "proof_sent") return '<div class="text-xs font-bold text-amber-700 bg-amber-50 rounded-lg px-3 py-2">وصلنا إثبات التحويل. بانتظار تأكيد الإدارة، وبعدها يظهر طلبك للسائقين.</div>';
+      const st = data.settings || {}, ins = st.instapay_number, vod = st.vodafone_cash_number;
+      const num = (lbl, v) => '<div class="flex items-center justify-between gap-2 text-xs"><span class="font-bold">' + lbl + '</span><span dir="ltr" class="font-extrabold tabular-nums">' + (v ? esc(v) : "قريباً") + '</span></div>';
+      return '<div class="cm-box">' +
+        (s.commission_status === "rejected" ? '<p class="text-xs font-bold text-red-700 bg-red-50 rounded-lg px-3 py-2">الإدارة لم تقبل الإثبات السابق. ارفع صورة التحويل الصحيحة.</p>' : '') +
+        '<p class="text-xs font-extrabold">ادفع عمولة المنصة ' + amt + ' (' + esc(s.commission_pct) + '%) لتظهر شحنتك للسائقين</p>' +
+        num("إنستا باي", ins) + num("فودافون كاش", vod) +
+        '<div class="grid grid-cols-2 gap-2 text-xs font-bold"><label class="wz-opt" style="flex-direction:row;justify-content:center"><input type="radio" name="cmch-' + id + '" value="instapay" checked /> إنستا باي</label><label class="wz-opt" style="flex-direction:row;justify-content:center"><input type="radio" name="cmch-' + id + '" value="vodafone" /> فودافون كاش</label></div>' +
+        '<input id="cmf-' + id + '" type="file" accept="image/*" class="w-full text-xs border border-slate-300 rounded-xl p-1.5" />' +
+        '<input id="cmr-' + id + '" maxlength="40" dir="ltr" placeholder="رقم العملية (اختياري)" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2" />' +
+        '<button id="cmb-' + id + '" onclick="submitCommissionProof(\'' + id + '\')" class="w-full py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold disabled:opacity-60">إرسال صورة التحويل</button>' +
+        '<div id="cmm-' + id + '" class="hidden text-xs font-bold rounded-lg px-3 py-2"></div></div>';
+    }
+    function cmMsg(id, t, ok) { const el = document.getElementById("cmm-" + id); if (!el) return; el.textContent = t || ""; el.className = "text-xs font-bold rounded-lg px-3 py-2 " + (t ? (ok ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-700") : "hidden"); }
+    async function submitCommissionProof(id) {
+      const inp = document.getElementById("cmf-" + id), btn = document.getElementById("cmb-" + id);
+      if (!inp || !inp.files[0]) return cmMsg(id, "اختار صورة التحويل أولاً.");
+      const ch = (document.querySelector('input[name="cmch-' + id + '"]:checked') || {}).value || "instapay";
+      const ref = (document.getElementById("cmr-" + id) || {}).value || "";
+      const file = inp.files[0];
+      btn.disabled = true;
+      const fail = m => { cmMsg(id, m); btn.disabled = false; };
+      try {
+        cmMsg(id, "جاري تجهيز الصورة...", true);
+        let blob;
+        try { blob = (await readImage(file, 1100)).blob; }
+        catch (e) { if (/^image\/(jpeg|png|webp)$/.test(file.type) && file.size <= 3 * 1024 * 1024) blob = file; else return fail("صيغة الصورة غير مدعومة (JPG أو PNG)."); }
+        if (blob.size > 3 * 1024 * 1024) return fail("حجم الصورة كبير.");
+        const path = id + "/" + Date.now() + ".jpg";
+        let lastErr = null;
+        for (let i = 0; i < 3; i++) {
+          cmMsg(id, "جاري رفع الصورة" + (i ? " (محاولة " + (i + 1) + ")" : "") + "...", true);
+          try { const up = await withTimeout(sb.storage.from("proofs").upload(path, blob, { contentType: blob.type || "image/jpeg" }), 40000); if (!up.error) { lastErr = null; break; } lastErr = up.error; } catch (e) { lastErr = e; }
+          await new Promise(r => setTimeout(r, 1500));
+        }
+        if (lastErr) return fail("تعذر رفع الصورة. تأكد من الإنترنت وحاول تاني.");
+        const r = await withTimeout(sb.rpc("submit_commission_proof", { p_id: id, p_channel: ch, p_path: path, p_ref: ref }), 30000).catch(e => ({ error: e }));
+        if (r.error) return fail(errMsg(r.error) + ".");
+        toast("تم إرسال إثبات التحويل. بانتظار تأكيد الإدارة.");
+        await refreshAndRender(false);
+      } catch (e) { fail("حدث خطأ غير متوقع."); }
+    }
+    function renderCommissionAdmin() {
+      const el = document.getElementById("admin-commission"); if (!el) return;
+      const list = data.shipments.filter(s => s.status === "pending_payment");
+      document.getElementById("cm-count").textContent = list.length ? list.length + " طلب" : "";
+      setHTML(el, list.length ? list.map(s => {
+        const id = esc(s.id), sent = s.commission_status === "proof_sent";
+        return '<div class="border border-slate-200 rounded-xl p-3 space-y-2"><div class="flex flex-wrap items-center justify-between gap-2"><span class="font-extrabold tabular-nums">' + id + '</span><span class="text-xs font-bold">عمولة ' + fmt(s.commission_amount) + ' ج.م (' + esc(s.commission_pct) + '% من ' + fmt(s.price) + ')</span></div>' +
+          '<div class="text-xs text-slate-500">' + routeText(s) + '</div>' +
+          (sent ? '<div class="text-xs">' + (s.commission_channel === "vodafone" ? "فودافون كاش" : "إنستا باي") + (s.commission_ref ? ' · رقم العملية: <span dir="ltr" class="font-bold">' + esc(s.commission_ref) + '</span>' : '') + '</div>' +
+            '<div class="flex gap-2"><button onclick="viewPrivate(\'proofs\',\'' + esc(s.commission_proof_path) + '\',\'إثبات تحويل ' + id + '\')" class="px-3 py-2 rounded-lg bg-slate-100 text-xs font-bold">عرض الصورة</button>' +
+            '<button onclick="reviewCommission(\'' + id + '\', true)" class="flex-1 py-2 rounded-lg bg-emerald-600 text-white text-xs font-extrabold">تأكيد وإظهار للسائقين</button>' +
+            '<button onclick="reviewCommission(\'' + id + '\', false)" class="px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 text-xs font-extrabold">رفض</button></div>'
+            : '<div class="text-xs font-bold text-amber-700">' + (s.commission_status === "rejected" ? "تم رفض الإثبات، بانتظار صورة جديدة" : "بانتظار تحويل العميل") + '</div>') + '</div>';
+      }).join("") : '<p class="text-xs text-slate-500">لا توجد طلبات بانتظار التأكيد.</p>');
+      const f = document.getElementById("admin-settings");
+      if (f && !f.dataset.filled && data.settings) {
+        f.dataset.filled = "1";
+        document.getElementById("st-pct").value = cmPct();
+        document.getElementById("st-insta").value = data.settings.instapay_number || "";
+        document.getElementById("st-voda").value = data.settings.vodafone_cash_number || "";
+      }
+    }
+    const reviewCommission = (id, ok) => rpc("admin_review_commission", { p_id: id, p_ok: ok }, ok ? "تم تأكيد العمولة وظهر الطلب للسائقين." : "تم رفض الإثبات.");
+    async function saveSettings(ev) {
+      ev.preventDefault();
+      const { error } = await sb.rpc("admin_set_settings", { p_pct: parseInt(document.getElementById("st-pct").value, 10), p_instapay: document.getElementById("st-insta").value, p_vodafone: document.getElementById("st-voda").value });
+      if (error) { toast(errMsg(error)); return false; }
+      toast("تم حفظ الإعدادات."); await refreshAndRender(false); return false;
     }
     function toggleDriverOnline() { driverOnline = !driverOnline; renderAll(); }
 
@@ -1174,7 +1352,7 @@ const HY_BUILD="20261126-4";
       setHTML(el, list.map((s, i) => {
         const live = s.status !== "delivered" && s.status !== "cancelled";
         const otpBox = live && data.secrets[s.id] ? '<span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-lg">رمز التسليم للمستلم: <strong class="tabular-nums">' + esc(data.secrets[s.id]) + '</strong></span>' : "";
-        const cancelBtn = (s.status === "requested" || s.status === "assigned") ? '<button onclick="cancelShipment(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 border border-red-200 font-bold">إلغاء الشحنة</button>' : "";
+        const cancelBtn = (s.status === "pending_payment" || s.status === "requested" || s.status === "assigned") ? '<button onclick="cancelShipment(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 border border-red-200 font-bold">إلغاء الشحنة</button>' : "";
         let rate = "";
         if (s.status === "delivered") rate = s.rating ? '<div class="text-sm text-amber-500 font-bold">تقييمك: ' + stars(s.rating) + '</div>' :
           '<div class="flex items-center gap-1 text-xs"><span class="text-slate-600 font-bold">قيّم السائق:</span>' + [1,2,3,4,5].map(n => '<button onclick="rateShipment(\'' + esc(s.id) + '\',' + n + ')" class="text-xl text-amber-400 hover:text-amber-500" aria-label="' + n + ' نجوم">★</button>').join("") + '</div>';
@@ -1182,7 +1360,7 @@ const HY_BUILD="20261126-4";
           '<div class="flex flex-wrap items-center justify-between gap-2"><span class="font-extrabold tabular-nums">' + esc(s.id) + '</span>' + statusBadge(s.status) + '</div>' +
           '<div class="text-sm font-semibold text-slate-700">' + routeText(s) + '</div>' + pickupBadge(s) + progressTimeline(s) +
           '<div class="text-xs text-slate-500">' + esc(truckLabel(s)) + ' · ' + esc(s.weight) + ' طن · ' + esc(s.cargo) + '</div>' +
-          '<div class="text-xs text-slate-500">السائق: ' + esc(driverLabel(s.driver_id)) + (s.driver_id ? ' · <button onclick="openDriverProfile(\'' + esc(s.driver_id) + '\')" class="underline font-bold" style="color:var(--accent-text)">ملف السائق</button>' : '') + '</div>' + goodsBlockShipper(s) + tripButtons(s) + rate +
+          '<div class="text-xs text-slate-500">السائق: ' + esc(driverLabel(s.driver_id)) + (s.driver_id ? ' · <button onclick="openDriverProfile(\'' + esc(s.driver_id) + '\')" class="underline font-bold" style="color:var(--accent-text)">ملف السائق</button>' : '') + '</div>' + goodsBlockShipper(s) + commissionBlockShipper(s) + tripButtons(s) + rate +
           '<div class="flex flex-wrap items-center justify-between gap-2 pt-1"><span class="font-extrabold text-orange-600 tabular-nums">' + fmt(s.price) + ' ج.م</span>' + otpBox +
           '<span class="flex gap-2">' + cancelBtn + '<button onclick="openWaybill(\'' + esc(s.id) + '\')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold">عرض البوليصة</button></span></div></div>';
       }).join(""));
@@ -1258,6 +1436,7 @@ const HY_BUILD="20261126-4";
         '<td class="p-3 tabular-nums font-semibold">' + fmt(s.price) + ' ج.م</td>' +
         '<td class="p-3">' + statusBadge(s.status) + (s.rating ? ' <span class="text-amber-500 text-xs">' + stars(s.rating) + '</span>' : '') + '</td></tr>').join("")
         : '<tr><td colspan="5" class="p-6 text-center text-slate-400">لا توجد نتائج مطابقة.</td></tr>');
+      renderCommissionAdmin();
       renderUsers();
     }
 
